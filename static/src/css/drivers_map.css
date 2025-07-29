@@ -1,0 +1,30 @@
+.drivers-map {
+    height: 90%;
+}
+
+.drivers-map .pickup-marker {
+    background-color: green;
+    border-radius: 50%;
+    border: 2px solid green;
+    text-align: center;
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+    color: white;
+}
+.drivers-map .delivery-marker {
+    background-color: red;
+    border-radius: 50%;
+    border: 2px solid red;
+    text-align: center;
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+    color: white;
+}
+.drivers-map .myDivIcon {
+    text-align: center;
+    /* Horizontally center the text (icon) */
+    line-height: 20px;
+    /* Vertically center the text (icon) */
+}

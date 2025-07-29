@@ -1,0 +1,42 @@
+<odoo>
+   <template id="signup_fields" inherit_id="auth_signup.fields" name="Custom Signup Fields" >
+        <xpath expr="//div[hasclass('field-name')]" position="after">
+            <div class="mb-3 field-city">
+                <label for="address">Your city</label>
+                <select class="form-control form-control-sm" id="city" name="city" required="required">
+                    <option value="">Select province/city</option>
+                </select>
+            </div>
+            <div class="mb-3 field-district">
+                <label for="address">Your district</label>
+                <select class="form-control form-control-sm" id="district" name="district" required="required">
+                    <option value="">Select district</option>
+                </select>
+            </div>
+            <div class="mb-3 field-address">
+                <label for="address">Your address</label>
+                <input name="address" t-att-value="address" id="address" class="form-control form-control-sm" autofocus="autofocus"
+                autocapitalize="off" required="required" t-att-type="'hidden' if only_passwords else 'text'"/>
+            </div>
+            <div class="mb-3 field-phone">
+                <label for="phone">Phone Number</label>
+                <input name="phone" t-att-value="phone" id="phone" class="form-control form-control-sm" autofocus="autofocus"
+                maxlength="10" autocapitalize="off" required="required" t-att-type="'hidden' if only_passwords else 'text'"/>
+            </div>
+            <div class="mb-3 field-phone-code">
+                <label for="phone">OTP code</label>
+                <input name="otp" t-att-value="otp" id="otp" class="form-control form-control-sm" autofocus="autofocus"
+                maxlength="6" autocapitalize="off" required="required" t-att-type="'hidden' if only_passwords else 'text'"/>
+            </div>
+            <a href="#" id="get_otp" class="btn btn-link btn-sm" role="button">Get OTP code</a>
+        </xpath>
+    </template>
+    <template id="signup" inherit_id="auth_signup.signup" name="Sign up login">
+        <xpath expr="//button" position="before">
+            <div class="checkbox">
+                <input type="checkbox" id='tnc' value="0"/>
+                <span class="ms-2">I have read <a href="/terms-and-conditions" target="_blank">Terms and Conditions</a></span>
+            </div>
+        </xpath>
+    </template>
+</odoo>

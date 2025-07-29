@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="menu_dashboard" model="website.menu">
+        <field name="name">Dashboard</field>
+        <field name="url">/dashboard</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">10</field>
+    </record>
+
+    <template id="shipping_statistics_template" name="Dashboard">
+        <t t-call="website.layout">
+            <style>
+                .filter-row {
+                    display: flex;
+                    justify-content: flex-start;
+                    gap: 16px;
+                    margin-bottom: 24px;
+                }
+                .btn-filter {
+                    flex: 1 1 0;
+                    min-width: 140px;
+                    border: 2px solid #dc3545;
+                    color: #dc3545;
+                    background: #fff;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    padding: 12px 0;
+                    transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+                    box-shadow: 0 2px 8px rgba(220,53,69,0.04);
+                    outline: none;
+                }
+                .btn-filter.active,
+                .btn-filter:focus {
+                    background: #ffc107;
+                    color: #dc3545;
+                    border-color: #ffc107;
+                    box-shadow: 0 4px 16px rgba(255,193,7,0.08);
+                }
+                .btn-filter:hover:not(.active) {
+                    background: #ffe082;
+                    color: #dc3545;
+                    border-color: #ffc107;
+                    cursor: pointer;
+                    box-shadow: 0 2px 8px rgba(255,193,7,0.10);
+                    transition: color 0.2s;
+                }
+                .order-row {
+                    transition: background 0.2s, color 0.2s;
+                }
+                .order-row:hover {
+                    background: #fff3cd !important; /* vàng nhạt DHL */
+                    color: #dc3545;
+                }
+                
+                .search-filter-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    margin-bottom: 20px;
+                    background: #f8f9fa;
+                    padding: 16px 24px;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 8px rgba(220,53,69,0.04);
+                }
+                .search-input {
+                    flex: 1 1 0;
+                    border: 1.5px solid #dc3545;
+                    border-radius: 8px;
+                    padding: 10px 16px;
+                    font-size: 1rem;
+                    outline: none;
+                    transition: border-color 0.2s;
+                }
+                .search-input:focus {
+                    border-color: #ffc107;
+                    background: #fffde7;
+                }
+                .btn-search {
+                    background: #dc3545;
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 10px 24px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    transition: background 0.2s;
+                    box-shadow: 0 2px 8px rgba(220,53,69,0.08);
+                }
+                .btn-search:hover {
+                    background: #ffc107;
+                    color: #dc3545;
+                }
+                .btn-date-filter {
+                    background: #fff;
+                    color: #dc3545;
+                    border: 2px solid #dc3545;
+                    border-radius: 8px;
+                    padding: 10px 20px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    margin-left: 8px;
+                    transition: background 0.2s, color 0.2s, border-color 0.2s;
+                }
+                .btn-date-filter:hover, .btn-date-filter.active {
+                    background: #ffc107;
+                    color: #dc3545;
+                    border-color: #ffc107;
+                }
+                .date-filter-menu {
+                    display: none;
+                    position: absolute;
+                    background: #fff;
+                    border: 1px solid #eee;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+                    padding: 16px;
+                    z-index: 100;
+                    top: 48px;
+                    right: 0;
+                    min-width: 260px;
+                }
+                .date-filter-menu.show {
+                    display: block;
+                }
+                .date-filter-menu label {
+                    font-weight: 500;
+                    color: #dc3545;
+                    margin-bottom: 4px;
+                }
+                .date-filter-menu input[type="date"] {
+                    width: 100%;
+                    padding: 6px 10px;
+                    border-radius: 6px;
+                    border: 1px solid #ccc;
+                    margin-bottom: 12px;
+                }
+                .date-filter-menu .btn-apply {
+                    background: #dc3545;
+                    color: #fff;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 8px 16px;
+                    font-weight: 600;
+                    margin-right: 8px;
+                }
+                .date-filter-menu .btn-cancel {
+                    background: #fff;
+                    color: #dc3545;
+                    border: 1px solid #dc3545;
+                    border-radius: 6px;
+                    padding: 8px 16px;
+                    font-weight: 600;
+                }
+                @media (max-width: 600px) {
+                    .search-filter-row {
+                        flex-direction: column;
+                        gap: 10px;
+                    }
+                }
+                .search-tag {
+                    display: inline-block;
+                    background: #ffc107;
+                    color: #dc3545;
+                    border-radius: 16px;
+                    padding: 4px 12px 4px 16px;
+                    margin-right: 8px;
+                    font-weight: 500;
+                    font-size: 1rem;
+                    position: relative;
+                }
+                .search-tag-close {
+                    margin-left: 8px;
+                    cursor: pointer;
+                    color: #dc3545;
+                    font-weight: bold;
+                    font-size: 1.1em;
+                }
+                .search-tag-close:hover {
+                    color: #fff;
+                    background: #dc3545;
+                    border-radius: 50%;
+                    padding: 0 4px;
+                }
+                .btn-create-order {
+                    background: #dc3545;
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 10px 24px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    box-shadow: 0 2px 8px rgba(220,53,69,0.08);
+                    transition: background 0.2s, color 0.2s;
+                    text-decoration: none;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                .btn-create-order:hover {
+                    background: #ffc107;
+                    color: #dc3545;
+                    text-decoration: none;
+                }
+            </style>
+            <div class="container mt-5">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 style="margin-bottom: 0; margin-left:10px;">Thống kê đơn hàng</h2>
+                    <a href="/shipping_order" class="btn-create-order">
+                        <i class="fa fa-plus"></i> Tạo đơn mới
+                    </a>
+                </div>
+                <div class="mt-4">
+                    <div class="mb-2" style="display: flex; justify-content: space-between; align-items: center;">
+                        <button class="btn btn-filter" data-filter="all" id="btn-all" style="margin: 20px;">Tất cả  (<t t-esc="count_all"/>)</button>
+                        <button class="btn btn-filter" data-filter="new" id="btn-new" style="margin: 20px;">Chờ lấy hàng (<t t-esc="count_new"/>)</button>
+                        <button class="btn btn-filter" data-filter="in_transit" id="btn-in-transit" style="margin: 20px;">Đang giao (<t t-esc="count_in_transit"/>)</button>
+                        <button class="btn btn-filter" data-filter="delivered" id="btn-delivered" style="margin: 20px;">Đã giao (<t t-esc="count_delivered"/>)</button>
+                        <button class="btn btn-filter" data-filter="canceled" id="btn-canceled" style="margin: 20px;">Đã huỷ (<t t-esc="count_canceled"/>)</button>
+                    </div>
+                    <div class="search-filter-row" style="position:relative;">
+                        <input type="text" class="search-input" id="order-search-input" placeholder="Mã vận đơn, tên người nhận, địa chỉ..."/>
+                        <div id="search-tags" style="margin: 8px 0;"></div>
+                        <button class="btn-search" id="btn-search">
+                            <i class="fa fa-search"></i> Tìm kiếm
+                        </button>
+                        <button class="btn-date-filter" id="btn-date-filter">
+                            <i class="fa fa-calendar"></i> Lọc theo thời gian
+                        </button>
+                        <div class="date-filter-menu" id="date-filter-menu">
+                            <label for="from-date">Từ ngày</label>
+                            <input type="date" id="from-date"/>
+                            <label for="to-date">Đến ngày</label>
+                            <input type="date" id="to-date"/>
+                            <div style="margin-top:8px;">
+                                <button class="btn-apply" id="btn-apply-date">Áp dụng</button>
+                                <button class="btn-cancel" id="btn-cancel-date">Huỷ</button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-striped" id="orders-table" style="border-radius:12px;overflow:hidden;">
+                        <thead style="background:#dc3545;color:#fff;">
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Receiver's Name</th>
+                                <th>Receiver's Address</th>
+                                <th>Total Fee</th>
+                                <th>Created Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody">
+                            <t t-foreach="orders" t-as="order">
+                                <tr t-att-data-status="order.status"
+                                    t-att-class="'order-row'"
+                                    style="cursor: pointer;"
+                                    t-att-onclick="'window.location.href=\'/tracking_order/' + str(order.id) + '\''">
+                                    <td><t t-esc="order.order_id"/></td>
+                                    <td><t t-esc="order.receiver_name"/></td>
+                                    <td><t t-esc="order.to_address"/></td>
+                                    <td><t t-esc="order.formater_money(order.total_fee)"/> VND</td>
+                                    <td>
+                                        <t t-esc="order.create_order_date.strftime('%d/%m/%Y %H:%M')"/>
+                                    </td>
+                                    <td>
+                                        <span t-att-class="'badge rounded-pill px-3 py-2 ' + (
+                                            order.status == 'delivered' and 'bg-success text-white' or
+                                            order.status == 'canceled' and 'bg-danger text-white' or
+                                            order.status in ['in_transit','waiting_pickup','picked_up','waiting_delivery'] and 'bg-warning text-dark' or
+                                            'bg-secondary text-white'
+                                        )">
+                                            <t t-esc="order.get_status_label()"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <nav>
+                        <ul class="pagination" id="orders-pagination"></ul>
+                    </nav>
+                </div>
+            </div>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script type="text/javascript">
+            <![CDATA[
+            document.addEventListener('DOMContentLoaded', function() {
+                let currentFilter = 'all';
+                let currentPage = 1;
+                const pageSize = 20;
+                let searchValue = '';
+                let dateFrom = '';
+                let dateTo = '';
+
+                function getFilteredRows() {
+                    const rows = Array.from(document.querySelectorAll('#orders-tbody tr'));
+                    return rows.filter(row => {
+                        // Filter theo trạng thái
+                        let statusOk = true;
+                        if (currentFilter === 'new') statusOk = row.dataset.status === 'new';
+                        else if (currentFilter === 'delivered') statusOk = row.dataset.status === 'delivered';
+                        else if (currentFilter === 'in_transit') statusOk = ['waiting_pickup', 'picked_up', 'in_transit', 'waiting_delivery'].includes(row.dataset.status);
+                        else if (currentFilter === 'canceled') statusOk = row.dataset.status === 'canceled';
+                        // Filter theo search
+                        let searchOk = true;
+                        if (searchValue) {
+                            const orderId = row.children[0].innerText.trim().toLowerCase();
+                            const receiverName = row.children[1].innerText.trim().toLowerCase();
+                            const toAddress = row.children[2].innerText.trim().toLowerCase();
+                            searchOk = orderId.includes(searchValue) || receiverName.includes(searchValue) || toAddress.includes(searchValue);
+                        }
+                        // Filter theo ngày
+                        let dateOk = true;
+                        if (dateFrom || dateTo) {
+                            const dateText = row.children[4].innerText.trim();
+                            const rowDate = new Date(dateText.split(' ')[0].split('/').reverse().join('-'));
+                            if (dateFrom) {
+                                const fromDate = new Date(dateFrom);
+                                if (rowDate < fromDate) dateOk = false;
+                            }
+                            if (dateTo) {
+                                const toDate = new Date(dateTo);
+                                if (rowDate > toDate) dateOk = false;
+                            }
+                        }
+                        return statusOk && searchOk && dateOk;
+                    });
+                }
+
+                function renderTable() {
+                    const rows = Array.from(document.querySelectorAll('#orders-tbody tr'));
+                    rows.forEach(row => row.style.display = 'none');
+                    const filteredRows = getFilteredRows();
+                    const totalPage = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+                    if (currentPage > totalPage) currentPage = 1;
+                    filteredRows.slice((currentPage-1)*pageSize, currentPage*pageSize).forEach(row => row.style.display = '');
+                    const pagin = document.getElementById('orders-pagination');
+                    pagin.innerHTML = '';
+
+                    const prevLi = document.createElement('li');
+                    prevLi.className = 'page-item' + (currentPage === 1 ? ' disabled' : '');
+                    const prevLink = document.createElement('a');
+                    prevLink.className = 'page-link';
+                    prevLink.href = '#';
+                    prevLink.innerHTML = '&laquo;';
+                    prevLink.onclick = function(e) {
+                        e.preventDefault();
+                        if (currentPage > 1) {
+                            currentPage--;
+                            renderTable();
+                        }
+                    };
+                    prevLi.appendChild(prevLink);
+                    pagin.appendChild(prevLi);
+
+                    for (let i = 1; i <= totalPage; i++) {
+                        const li = document.createElement('li');
+                        li.className = 'page-item' + (i === currentPage ? ' active' : '');
+                        const a = document.createElement('a');
+                        a.className = 'page-link';
+                        a.href = '#';
+                        a.textContent = i;
+                        a.onclick = function(e) {
+                            e.preventDefault();
+                            currentPage = i;
+                            renderTable();
+                        };
+                        li.appendChild(a);
+                        pagin.appendChild(li);
+                    }
+
+                    const nextLi = document.createElement('li');
+                    nextLi.className = 'page-item' + (currentPage === totalPage ? ' disabled' : '');
+                    const nextLink = document.createElement('a');
+                    nextLink.className = 'page-link';
+                    nextLink.href = '#';
+                    nextLink.innerHTML = '&raquo;';
+                    nextLink.onclick = function(e) {
+                        e.preventDefault();
+                        if (currentPage < totalPage) {
+                            currentPage++;
+                            renderTable();
+                        }
+                    };
+                    nextLi.appendChild(nextLink);
+                    pagin.appendChild(nextLi);
+                }
+                document.querySelectorAll('.btn-filter').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        currentFilter = this.dataset.filter;
+                        currentPage = 1;
+                        renderTable();
+                    });
+                });
+
+                document.getElementById('btn-search').onclick = function() {
+                    searchValue = document.getElementById('order-search-input').value.trim().toLowerCase();
+                    currentPage = 1;
+                    renderTable();
+                    renderSearchTag();
+                    document.getElementById('order-search-input').value = '';
+                };
+
+                function renderSearchTag() {
+                    const tagContainer = document.getElementById('search-tags');
+                    tagContainer.innerHTML = '';
+                    if (searchValue) {
+                        const tag = document.createElement('span');
+                        tag.className = 'search-tag';
+                        tag.textContent = searchValue;
+                        const closeBtn = document.createElement('span');
+                        closeBtn.className = 'search-tag-close';
+                        closeBtn.innerHTML = '&times;';
+                        closeBtn.onclick = function() {
+                            searchValue = '';
+                            currentPage = 1;
+                            renderTable();
+                            renderSearchTag();
+                        };
+                        tag.appendChild(closeBtn);
+                        tagContainer.appendChild(tag);
+                    }
+                }
+
+                document.getElementById('btn-apply-date').onclick = function() {
+                    dateFrom = document.getElementById('from-date').value;
+                    dateTo = document.getElementById('to-date').value;
+                    currentPage = 1;
+                    renderTable();
+                    document.getElementById('date-filter-menu').classList.remove('show');
+                };
+
+                document.getElementById('btn-cancel-date').onclick = function() {
+                    document.getElementById('date-filter-menu').classList.remove('show');
+                };
+
+                document.getElementById('btn-all').classList.add('active');
+                renderTable();
+                renderSearchTag();
+
+                // Date filter menu toggle
+                const btnDateFilter = document.getElementById('btn-date-filter');
+                const dateMenu = document.getElementById('date-filter-menu');
+                btnDateFilter.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dateMenu.classList.toggle('show');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!dateMenu.contains(e.target) && e.target !== btnDateFilter) {
+                        dateMenu.classList.remove('show');
+                    }
+                });
+            });
+            ]]>
+            </script>
+        </t>
+    </template>
+</odoo>

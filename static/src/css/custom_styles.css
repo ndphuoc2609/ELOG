@@ -1,0 +1,10 @@
+nav.navbar{
+    background-color: #fecb2f !important;
+}
+nav img{
+    height: 1.5rem !important;
+}
+.btn-primary {
+    background-color: #d40511 !important;
+    border-color: #d40511 !important;
+}

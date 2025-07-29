@@ -1,0 +1,5 @@
+<templates id="template" xml:space="preserve">
+    <t t-name="custom_website.LeafletMapWidget" owl="1">
+        <div id="map" style="height: 300px;"></div>
+    </t>
+</templates>

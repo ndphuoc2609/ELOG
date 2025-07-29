@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_website.Renderer" owl="1">
+        <div id="map" class="drivers-map"></div>
+    </t>
+</templates>

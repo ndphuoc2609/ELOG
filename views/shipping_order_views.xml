@@ -1,0 +1,1061 @@
+<odoo>
+    <record id="view_shipping_order_form" model="ir.ui.view">
+        <field name="name">shipping.order.form</field>
+        <field name="model">shipping.order</field>
+        <field name="arch" type="xml">
+            <form string="Shipping Order">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="new,waiting_pickup,picked_up,in_transit,waiting_delivery,delivered,canceled,failed" />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" name="action_view_package_delivery"
+                            string="Package Delivery" type="object"
+                            widget="statinfo" icon="fa-arrows-v"/>
+                    </div>
+                    <group string="Information">
+                        <group string="Customer">
+                            <field name="customer_id" colspan="1"/>
+                            <field name="customer_phone" colspan="1"/>
+                            <field name="province_sender" colspan="1"/>
+                            <field name="district_sender" colspan="1"/>
+                            <field name="from_address" colspan="1"/>
+                        </group>
+                        <group string="Receiver">
+                            <field name="receiver_name" colspan="1"/>
+                            <field name="receiver_phone" colspan="1"/>
+                            <field name="province_receiver" colspan="1"/>
+                            <field name="district_receiver" colspan="1"/>
+                            <field name="to_address" colspan="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Package and Shipping" name="product_shipping">
+                            <group>
+                                <field name="product_ids">
+                                    <tree>
+                                        <field name="product_name"/>
+                                        <field name="barcode"/>
+                                        <field name="weight"/>
+                                        <field name="dimensions"/>
+                                        <field name="shipment_value"/>
+                                    </tree>
+                                </field>
+                                <field name="total_weight"/>
+                                <field name="total_shipment_value"/>
+                                <field name="package_location"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Shipping Services" name="shipping_services">
+                            <group string="Pick-up">
+                                <field name="pickup_type"/>
+                                <field name="pickup_address"/>
+                                <field name="dhl_service_point"/>
+                                <field name="pickup_shift"/>
+                                <field name="pickup_note"/>
+                            </group>
+
+                            <group string="Delivery">
+                                <field name="partial_delivery"/>
+                                <field name="joint_inspection"/>
+                            </group>
+
+                            <group string="Return Options">
+                                <field name="return_location"/>
+                            </group>
+
+                            <group string="Additional Services">
+                                <field name="insurance"/>
+                                <field name="additional_service_note"/>
+                                <field name="service_fee"/>
+                            </group>
+                        </page>
+                    
+                        <page string="Shipping Fees" name="shipping_fees">
+                            <group>
+                                <field name="shipping_fee"/>
+                                <field name="promotion_code"/>
+                                <field name="promotion_discount"/>
+                                <field name="total_fee"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Transports" name="driver_shipping">
+                            <group>
+                                <field name="transport_ids">
+                                    <tree>
+                                        <field name="driver_id"/>
+                                        <field name="driver_phone"/>
+                                        <field name="type"/>
+                                        <field name="from_location"/>
+                                        <field name="to_location"/>
+                                        <field name="state"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group>
+                                <field name="status"/>
+                                <field name="estimated_delivery_date"/>
+                                <field name="estimated_pickup_date"/>
+                            </group>
+                        </page>
+                    </notebook>
+
+                    <group>
+                        <group>
+                            <field name="from_latitude" colspan="1" invisible="1"/>
+                            <field name="from_longitude" colspan="1" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="to_latitude" colspan="1" invisible="1"/>
+                            <field name="to_longitude" colspan="1" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <div name='leaflet'></div>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_shipping_order_tree" model="ir.ui.view">
+        <field name="name">shipping.order.tree</field>
+        <field name="model">shipping.order</field>
+        <field name="arch" type="xml">
+            <tree string="Shipping Orders" default_order="create_date desc">
+                <field name="order_id"/>
+                <field name="customer_name"/>
+                <field name="from_address"/>
+                <field name="to_address"/>
+                <field name="current_driver_name" string="Driver Name" />
+                <field name="current_driver_phone" string="Driver Phone" />
+                <field name="package_location"/>
+                <field name="status"  optional="show" widget="badge" 
+                    decoration-warning="status == 'waiting'"
+                    decoration-success="status == 'delivered'" 
+                    decoration-danger="status == 'canceled'" 
+                    />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_shipping_order_search" model="ir.ui.view">
+        <field name="name">shipping.order.search</field>
+        <field name="model">shipping.order</field>
+        <field name="arch" type="xml">
+            <search string="Shipping Orders">
+                <field name="order_id"/>
+                <field name="customer_name"/>
+                <field name="customer_phone"/>
+                <field name="from_address"/>
+                <field name="to_address"/>
+                <field name="current_driver_name" string="Driver Name"/>
+                <field name="current_driver_phone" string="Driver Phone"/>
+                <group expand="0" string="Group By">
+                    <filter string="Driver Name" name="groupby_current_driver_name" domain="[]" context="{'group_by': 'current_driver_name'}"/>
+                    <filter string="Driver Phone" name="groupby_current_driver_phone" domain="[]" context="{'group_by': 'current_driver_phone'}"/>
+                </group>
+
+            </search>
+        </field>
+    </record>
+    
+    <record id="menu_shipping_form" model="website.menu">
+        <field name="name">Shipping Orders</field>
+        <field name="url">/shipping_order</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="menu_tracking_form" model="website.menu">
+        <field name="name">Tracking Orders</field>
+        <field name="url">/tracking_order</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">11</field>
+    </record>
+
+    <template id="main_layout" name="Main Layout">
+        <t t-call="website.layout">
+            <!-- <t t-set="no_header" t-value="True"/> -->
+            <t t-set="no_footer" t-value="True"/>
+            <t t-out="0"/>
+        </t>
+    </template>
+
+    <template id="main_page_template" name="Main Page">
+        <t t-call="custom_website.main_layout">
+            <section class="s_banner" data-snippet="s_banner"
+                         style="height: 100%; background-image: url(&quot;https://www.dhl.com/content/dam/dhl/global/core/images/marketing-stage-2730x1120/employee-receives-customer-signature-0001.web.1365.428.jpg&quot;); background-size: cover; background-position: 80% 20%">
+                <div class="container py-5">
+                    <div class="card mt-3">
+                        <div class="card-body" style="border: 1px solid #ccc;border-radius: 5px;box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);padding: 20px;background-color: #fff;transition: box-shadow 0.3s;">
+                            <h5 class="card-title" style="font-weight:700;color:#d40511;">Track Your Shipment</h5>
+                            <form id="trackOrderForm">
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label for="order_id" class="sr-only">Order ID</label>
+                                    <input type="text" class="form-control" id="order_id" name="order_id" placeholder="Enter your tracking number" required="1"/>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="showOrderLog()">Tracking</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="modal fade" id="orderLogModal" tabindex="-1" role="dialog" aria-labelledby="orderLogLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="orderLogLabel" style="text-decoration: underline;">Order Logs</h5>
+                        </div>
+                        <div class="modal-body" id="orderLogContent">
+                            <!-- Logs will be displayed here -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                function showOrderLog() {
+                    const orderId = document.getElementById('order_id').value.trim();
+                    fetch('/get_order_logs/' + orderId)
+                        .then(response => response.json())
+                        .then(data => {
+                            let logsHtml = '';
+                            if (data.logs &amp;&amp; data.logs.length > 0) {
+                                logsHtml += `<h5 class="customer-title">Customer Information</h5>`;
+                                logsHtml += '<table class="table table-bordered">';
+                                logsHtml += '<thead><tr><th>Sender</th><th>Receiver</th></tr></thead>';
+                                logsHtml += '<tbody>';
+                                logsHtml += `<tr>
+                                                <td>
+                                                    <p><strong>Sender:</strong> ${data.sender.name}</p>
+                                                    <p><strong>Phone:</strong> ${data.sender.phone}</p>
+                                                    <p><strong>Address:</strong> ${data.sender.address}</p>
+                                                </td>
+                                                <td>
+                                                    <p><strong>Receiver:</strong> ${data.receiver.name}</p>
+                                                    <p><strong>Phone:</strong> ${data.receiver.phone}</p>
+                                                    <p><strong>Address:</strong> ${data.receiver.address}</p>
+                                                </td>
+                                            </tr>`;
+                                logsHtml += '</tbody></table>';
+                                
+                                logsHtml += `<h5 class="customer-title">Logs Details</h5>`;
+                                logsHtml += `<p><strong>Estimated Delivery Date:</strong> ${data.estimated_delivery_date}</p>`;
+                                data.logs.forEach(log => {
+                                    logsHtml += `<div class="log-entry">
+                                                    <p><strong>Date:</strong> ${log.date}</p>
+                                                    <div>${log.body}</div>
+                                                    <hr/>
+                                                </div>`;
+                                });
+                            } else {
+                                logsHtml = '<p>No logs found for this order.</p>';
+                            }
+                            document.getElementById('orderLogContent').innerHTML = logsHtml;
+                            document.getElementById('orderLogLabel').innerText = `Order: ${orderId}`;
+                            jQuery('#orderLogModal').modal('show');
+                        })
+                        .catch(error => {
+                            console.error('Error fetching order logs:', error);
+                        });
+                }
+            </script>
+            <style>
+                .customer-title {
+                    color: #d40511;
+                    font-weight: bold;
+                    margin-top: 20px;
+                }
+
+                .table {
+                    width: 100%;
+                    margin-bottom: 20px;
+                    border-collapse: collapse;
+                }
+
+                .table-bordered {
+                    border: 1px solid #dee2e6;
+                }
+
+                .table th, .table td {
+                    padding: 8px;
+                    text-align: left;
+                    border: 1px solid #dee2e6;
+                }
+
+                .log-entry {
+                    margin-top: 10px;
+                    padding: 10px;
+                    background-color: #f9f9f9;
+                    border-radius: 5px;
+                }
+            </style>
+        </t>
+    </template>
+
+    <template id="shipping_order_template" name="Shipping Order Form">
+        <t t-call="website.layout">
+            <t t-set="title">Shipping Order Form</t>
+            <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+            <div id="wrap">
+                <div class="oe_structure">
+                    <div class="container">
+                        <div class="col-md-12">
+                            <div class="shipping-instructions">
+                                <h3>Ship Now</h3>
+                            </div>
+                            <div id="map" style="height: 300px;margin-bottom: 15px;"></div>
+                            <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+                            <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+                            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                            <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+                            <script src="custom_website/static/src/js/address_to_marker.js"></script>
+                            <script src="custom_website/static/src/js/address_from_marker.js"></script>
+                            <script src="custom_website/static/src/js/action_views.js"></script>
+                            <link type="text/css" rel="stylesheet" href="custom_website/static/src/css/shipping_order.css"></link>
+                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></link>
+                            <script>
+                                const map = L.map('map');
+                                console.log(navigator.geolocation);
+
+                                if (navigator.geolocation) {
+                                    navigator.geolocation.getCurrentPosition(function(position) {
+                                        const lat = position.coords.latitude;
+                                        const lon = position.coords.longitude;
+
+                                        map.setView([lat, lon], 13);
+
+                                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                            maxZoom: 19,
+                                        }).addTo(map);
+
+                                        L.marker([lat, lon]).addTo(map)
+                                            .bindPopup('You are here!')
+                                            .openPopup();
+                                    }, function() {
+                                        alert('Could not get your location.');
+                                        map.setView([51.505, -0.09], 13);
+                                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                            maxZoom: 19,
+                                        }).addTo(map);
+                                    });
+                                } else {
+                                    alert('Geolocation is not supported by this browser.');
+                                    map.setView([51.505, -0.09], 13);
+                                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                        maxZoom: 19,
+                                    }).addTo(map);
+                                };
+                            </script>
+                            <form role="form" action="/create/shipping_order" method="POST">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <div class="form_container">
+                                    <!-- Sender Information -->
+                                    <div class="form-section">
+                                        <h3>Sender Information</h3>
+                                        <div class="form-group">
+                                            <label for="customer_name" class="sender-label">Sender's Name:</label>
+                                            <input type="text" class="form-control" id="customer_name" name="customer_name" 
+                                                t-att-value="customer_name" required="required" readonly="readonly"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="customer_phone" class="sender-label">Phone:</label>
+                                            <input type="text" class="form-control" id="customer_phone" name="customer_phone" 
+                                                t-att-value="customer_phone" required="required" readonly="readonly"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="province_sender" class="sender-label">Province:</label>
+                                            <select class="form-control" id="province_sender" name="province_sender" required="required">
+                                                <option value="">Select province/city</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="district_sender" class="sender-label">Wards/Commune:</label>
+                                            <select class="form-control" id="district_sender" name="district_sender" required="required">
+                                                <option value="">Select district</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="from_address" class="sender-label">Address:</label>
+                                            <input type="text" class="form-control" id="from_address" name="from_address" required="required" onkeypress="preventEnter(event)"/>
+                                        </div>
+                                    </div>
+
+                                    <!-- Receiver Information -->
+                                    <div class="form-section">
+                                        <h3>Receiver Information</h3>
+                                        <div class="form-group">
+                                            <label for="receiver_name" class="sender-label">Receiver's Name:</label>
+                                            <input type="text" class="form-control" id="receiver_name" name="receiver_name" required="required"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="receiver_phone" class="sender-label">Phone:</label>
+                                            <input type="text" class="form-control" id="receiver_phone" name="receiver_phone" required="required"
+                                            pattern="^(0[1-9][0-9]{8,9})$" title="Phone Number"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="province_receiver" class="sender-label">Province:</label>
+                                            <select class="form-control" id="province_receiver" name="province_receiver" required="required">
+                                                <option value="">Select province/city</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="district_receiver" class="sender-label">Wards/Commune:</label>
+                                            <select class="form-control" id="district_receiver" name="district_receiver" required="required">
+                                                <option value="">Select district</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="to_address" class="sender-label">Address:</label>
+                                            <input type="text" class="form-control" id="to_address" name="to_address" required="required" onkeypress="preventEnter(event)"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="hidden_field" style="display:none;">
+                                    <div class="form-group">
+                                        <label for="from_latitude">From Latitude:</label>
+                                        <input type="text" class="form-control" id="from_latitude" name="from_latitude"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="from_longitude">From Longitude:</label>
+                                        <input type="text" class="form-control" id="from_longitude" name="from_longitude"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="to_latitude">To Latitude:</label>
+                                        <input type="text" class="form-control" id="to_latitude" name="to_latitude"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="to_longitude">To Longitude:</label>
+                                        <input type="text" class="form-control" id="to_longitude" name="to_longitude"/>
+                                    </div>
+                                </div>
+                                <!-- Products Information -->
+                                <div class="shipment-info">
+                                    <h3>Shipment's Information</h3>
+                                    
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:50%">Package Description</th>
+                                                <th>Weight (kg)</th>
+                                                <th>Dimensions (cm) (LxWxH)</th>
+                                                <th>Package value (VND)</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="product_body">
+                                            <tr>
+                                                <td><input id="" type="text" name="product_name_0" class="form-control" /></td>
+                                                <td><input type="number" name="weight_0" min="0.01" step="0.01" class="form-control" /></td>
+                                                <td><input type="text" name="dimensions_0" class="form-control" /></td>
+                                                <td><input type="number" name="shipment_value_0" min="0" step="1000" class="form-control" /></td>
+                                                <td class="action-icon"><i class="fas fa-plus" onclick="addRow()"></i></td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th style="font-weight: bold">Total</th>
+                                                <th id="total_weight" name="total_weight">0 kg</th>
+                                                <th id="total_dimensions" style="font-size: 0;"></th>
+                                                <th id="total_shipment_value" name="total_shipment_value">0 VND</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                <div class="service-section">
+                                    <h3>Shipping Services</h3>
+                                    <div class="service_form">
+
+                                        <!-- Pick-up Service -->
+                                        <div class="sub-section">
+
+                                            <div id="pickup_address_group" class="conditional-field">
+                                                <div class="form-group">
+                                                    <label for="pickup_address">Pickup Address:</label>
+                                                    <input type="text" class="form-control" id="pickup_address" name="pickup_address"/>
+                                                </div>
+                                            </div>
+
+                                            <div id="dhl_service_point_group" class="conditional-field">
+                                                <div class="form-group">
+                                                    <label for="dhl_service_point">DHL Service Point:</label>
+                                                    <input type="text" class="form-control" id="dhl_service_point" name="dhl_service_point"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="sub-section">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="partial_delivery" name="partial_delivery"/>
+                                                <label class="sender-label" for="partial_delivery">Partial Delivery</label>
+                                            </div>
+                                            
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="joint_inspection" name="joint_inspection"/>
+                                                <label class="sender-label" for="joint_inspection">Joint Inspection</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="insurance" name="insurance"/>
+                                                <label class="sender-label" for="insurance">Insurance (+5,000 VND)</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Return Options -->
+                                            <div class="sub-section">
+                                                <div class="form-group">
+                                                    <label class="sender-label" style="width: 200px;" for="pickup_type">Pickup Type:</label>
+                                                    <select class="form-control" id="pickup_type" name="pickup_type">
+                                                        <option value="my_address">At my address</option>
+                                                        <option value="service_point">Bring to service point</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="sub-section">
+                                                <div class="form-group">
+                                                    <label class="sender-label" style="width: 200px;" for="return_location">Return Location:</label>
+                                                    <select class="form-control" id="return_location" name="return_location">
+                                                        <option value="service_point">At service point</option>
+                                                        <option value="my_address">At my address</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                    </div>
+                                    <div class="sub-section" style="display: flex;">
+                                        <label class="sender-label" style="width: 200px;" for="additional_service_note">Note:</label>
+                                        <textarea class="form-control" id="additional_service_note" name="additional_service_note" rows="1"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="fee-section">
+                                    <h3>Service Fees</h3>
+                                    <div class="fee-item">
+                                        <span class="fee_name">Shipping fee</span>
+                                        <span class="fee_value" id="shipping_fee_display">0 VND</span>
+                                        <input type="hidden" name="shipping_fee" id="shipping_fee_input"/>
+                                    </div>
+                                    <div class="fee-item" id="insurance_fee" style="display: none;">
+                                        <span class="fee_name">Insurance Fee</span>
+                                        <span class="fee_value" id="insurance_fee">+5,000 VND</span>
+                                        <input type="hidden" name="insurance_fee" id="insurance_fee_input"/>
+                                    </div>
+                                    <div class="promotion-section">
+                                        <div class="promo-input">
+                                            <input type="text" class="fee_name" placeholder="Enter promo code" 
+                                                id="promotion_code" name="promotion_code"/>
+                                            <button type="button" class="btn btn-primary" onclick="applyPromotion()">Apply</button>
+                                            <span id="promotion_discount" class="fee_value" style="display: none;">-5,000 VND</span>
+                                            <input type="hidden" name="promotion_discount" id="promotion_discount_input"/>
+                                        </div>
+                                    </div>                                    
+                                    <div class="fee-item">
+                                        <span class="fee_name">Estimated pickup date:</span>
+                                        <span class="fee_value" t-esc="estimated_pickup_date"/>
+                                    </div>
+                                    <div class="fee-item">
+                                        <span class="fee_name">Estimated delivery date:</span>
+                                        <span class="fee_value" t-esc="estimated_delivery_date"/>
+                                    </div>
+                                    <div class="fee-item">
+                                        <span class="fee_name" style="font-weight: 700">TOTAL AMOUNT</span>
+                                        <span id="total_fee" class="fee_value" style="font-weight: 700" t-esc="shipping_fee"/>
+                                        <input type="hidden" name="total_fee" id="total_fee_input"/>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <button type="submit" class="btnsubmit">Order Now</button>
+                                </div>
+                            </form>
+                            <script src="custom_website/static/src/js/address_option.js"></script>
+                            <script>
+                                function preventEnter(event) {
+                                    if (event.key === 'Enter') {
+                                        event.preventDefault();
+                                    }
+                                }
+                            </script>
+                            <script type="text/javascript">
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const shippingFeeDisplay = document.getElementById('shipping_fee_display');
+                                    const totalFeeElement = document.getElementById('total_fee');
+                                    const insuranceCheckbox = document.getElementById('insurance');
+                                    const promoCodeInput = document.getElementById('promotion_code');
+                                    const promoDiscountElement = document.getElementById('promotion_discount');
+                                    const insuranceFeeDiv = document.getElementById('insurance_fee');
+                                    let isInsuranceActive = false;
+                                    let isPromoActive = false;
+
+                                    const observer = new MutationObserver(updateTotalFee);
+                                    observer.observe(shippingFeeDisplay, { childList: true, subtree: true });
+
+                                    insuranceCheckbox.addEventListener('change', () => {
+                                        isInsuranceActive = insuranceCheckbox.checked;
+                                        insuranceFeeDiv.style.display = isInsuranceActive ? 'flex' : 'none';
+                                        updateTotalFee();
+                                    });
+
+                                    window.applyPromotion = function () {
+                                        const promoCode = promoCodeInput.value.trim();
+                                        const validPromoCode = 'DHLCODE';
+
+                                        if (promoCode === validPromoCode) {
+                                            isPromoActive = true;
+                                            promoDiscountElement.style.display = 'flex';
+                                            promoDiscountElement.textContent = '-5,000 VND';
+                                        } else {
+                                            isPromoActive = false;
+                                            promoDiscountElement.style.display = 'none';
+                                            if (promoCode) alert('Invalid promo code');
+                                        }
+
+                                        updateTotalFee();
+                                    };
+
+                                    function updateTotalFee() {
+                                        const shippingFeeValue = parseInt(shippingFeeDisplay.textContent.replace(/[^\d]/g, ''), 10) || 0;
+                                        let total = shippingFeeValue;
+
+                                        if (isInsuranceActive) total += 5000;
+                                        if (isPromoActive) total -= 5000;
+
+                                        total = Math.max(total, 0);
+                                        totalFeeElement.textContent = total.toLocaleString('en-US') + ' VND';
+                                        document.getElementById('total_fee_input').value = total;
+                                    }
+
+                                    updateTotalFee();
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="tracking_order_template" name="Tracking Orders">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <h2>Tracking Orders</h2>
+                <div class="row">
+                    <div class="col-md-8">
+                        <t t-if="orders">
+                            <ul class="list-group">
+                                <t t-set="new_count" t-value="0"/>
+                                <t t-set="waiting_pickup_count" t-value="0"/>
+                                <t t-set="picked_up_count" t-value="0"/>
+                                <t t-set="in_transit_count" t-value="0"/>
+                                <t t-set="waiting_delivery_count" t-value="0"/>
+                                <t t-set="delivered_count" t-value="0"/>
+                                <t t-set="canceled_count" t-value="0"/>
+                                <t t-set="failed_count" t-value="0"/>    
+                                <t t-foreach="orders" t-as="order">
+                                    <t t-if="order.status == 'new'">
+                                        <t t-set="new_count" t-value="new_count + 1"/>
+                                    </t>
+                                    <t t-if="order.status == 'waiting_pickup'">
+                                        <t t-set="waiting_pickup_count" t-value="waiting_pickup_count + 1"/>
+                                    </t>
+                                    <t t-if="order.status == 'picked_up'">
+                                        <t t-set="picked_up_count" t-value="picked_up_count + 1"/>
+                                    </t>
+                                    <t t-if="order.status == 'in_transit'">
+                                        <t t-set="in_transit_count" t-value="in_transit_count + 1"/>
+                                    </t>
+                                    <t t-if="order.status == 'waiting_delivery'">
+                                        <t t-set="waiting_delivery_count" t-value="waiting_delivery_count + 1"/>
+                                    </t>
+                                    <t t-if="order.status == 'delivered'">
+                                        <t t-set="delivered_count" t-value="delivered_count + 1"/>
+                                    </t>
+                                    <t t-if="order.status == 'canceled'">
+                                        <t t-set="canceled_count" t-value="canceled_count + 1"/>
+                                    </t>
+                                    <t t-if="order.status == 'failed'">
+                                        <t t-set="failed_count" t-value="failed_count + 1"/>
+                                    </t>
+                                </t>
+                                <t t-if="new_count > 0">
+                                    <li class="list-group-item">
+                                        <a t-attf-href="/tracking_order/status/new">
+                                            <strong>New</strong> - <t t-esc="new_count"/> orders
+                                        </a>
+                                    </li>
+                                </t>
+                                <t t-if="waiting_pickup_count > 0">
+                                    <li class="list-group-item">
+                                        <a t-attf-href="/tracking_order/status/waiting_pickup">
+                                            <strong>Waiting for Pickup</strong> - <t t-esc="waiting_pickup_count"/> orders
+                                        </a>
+                                    </li>
+                                </t>
+                                <t t-if="picked_up_count > 0">
+                                    <li class="list-group-item">
+                                        <a t-attf-href="/tracking_order/status/picked_up">
+                                            <strong>Picked Up</strong> - <t t-esc="picked_up_count"/> orders
+                                        </a>
+                                    </li>
+                                </t>
+                                <t t-if="in_transit_count > 0">
+                                    <li class="list-group-item">
+                                        <a t-attf-href="/tracking_order/status/in_transit">
+                                            <strong>In transit</strong> - <t t-esc="in_transit_count"/> orders
+                                        </a>
+                                    </li>
+                                </t>
+                                <t t-if="waiting_delivery_count > 0">
+                                    <li class="list-group-item">
+                                        <a t-attf-href="/tracking_order/status/waiting_delivery">
+                                            <strong>Waiting for Delivery</strong> - <t t-esc="waiting_delivery_count"/> orders
+                                        </a>
+                                    </li>
+                                </t>
+                                <t t-if="delivered_count > 0">
+                                    <li class="list-group-item">
+                                        <a t-attf-href="/tracking_order/status/delivered">
+                                            <strong>Delivered</strong> - <t t-esc="delivered_count"/> orders
+                                        </a>
+                                    </li>
+                                </t>
+                                <t t-if="canceled_count > 0">
+                                    <li class="list-group-item">
+                                        <a t-attf-href="/tracking_order/status/canceled">
+                                            <strong>Cancelled</strong> - <t t-esc="canceled_count"/> orders
+                                        </a>
+                                    </li>
+                                </t>
+                                <t t-if="failed_count > 0">
+                                    <li class="list-group-item">
+                                        <a t-attf-href="/tracking_order/status/failed">
+                                            <strong>Failed</strong> - <t t-esc="failed_count"/> orders
+                                        </a>
+                                    </li>
+                                </t>
+                            </ul>
+                            <a href="/list_order" class="btn btn-primary mt-3">Orders History</a>
+                        </t>
+                        <t t-else="">
+                            <p>No orders found.</p>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="orders_by_status_template" name="Orders by Status">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <h2>Orders</h2>
+                <t t-if="orders">
+                    <ul class="list-group">
+                        <t t-foreach="orders" t-as="order">
+                            <li class="list-group-item">
+                                <a t-attf-href="/tracking_order/#{order.id}">
+                                    <strong><t t-esc="order.order_id"/></strong> - <t t-esc="order.status"/>
+                                </a>
+                            </li>
+                        </t>
+                    </ul>
+                </t>
+                <t t-else="">
+                    <p>No orders found.</p>
+                </t>
+                <a href="/tracking_order" class="btn btn-primary mt-3">Back to Statuses</a>
+            </div>
+        </t>
+    </template>
+
+    <template id="list_order_template" name="List Orders">
+        <t t-call="website.layout">
+            <div class="container mt-5" style="margin-bottom:50px;">
+                <h2>Order History</h2>
+                <t t-if="orders">
+                    <table class="table table-bordered table-striped">
+                        <thead style="background-color:#fecb2f;">
+                            <tr>
+                                <th>ID</th>
+                                <th>Receiver</th>
+                                <th>Created Date</th>
+                                <th>Total Fees</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="orders" t-as="order">
+                                <tr class="order-row" style="cursor: pointer;" t-att-onclick="'window.location.href=\'/tracking_order/' + str(order.id) + '\''">
+                                    <td><t t-esc="order.id"/></td>
+                                    <td><t t-esc="order.receiver_name"/></td>
+                                    <td>
+                                        <t t-esc="order.create_date.strftime('%Y-%m-%d')"/>
+                                    </td>
+                                    <td><t t-esc="order.total_fee"/> VND</td>
+                                    <td><t t-esc="order.get_status_label()"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+                <t t-else="">
+                    <p>No orders found.</p>
+                </t>
+            </div>
+        </t>
+        <style>
+            .order-row:hover {
+                background-color: #f78e0c;
+            }
+        </style>
+    </template>
+
+    <template id="order_detail_template" name="Order Detail">
+        <t t-call="website.layout">
+            <style>
+                card-text{
+
+                }
+
+            </style>
+            <div class="container mt-5">
+                <h2>Order Detail:  <t t-esc="order.order_id"/> - <t t-esc="order.get_status_label()"/></h2>
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="card" style="margin-top:20px;">
+                            <div class="card-body">
+                                <div class="inforcustomer" style="display:flex;">
+                                    <div class="inforcustomer-sender" style="width: 50%;margin-right: 30px;">
+                                        <p class="card-text">
+                                            <span>Sender’s name:</span>
+                                            <span style="margin-left: 10px;"><t t-esc="order.customer_name"/></span>
+                                        </p>
+                                        <p class="card-text">
+                                            <span>Sender’s phone:</span>
+                                            <span style="margin-left: 10px;"><t t-esc="order.customer_phone"/></span>
+                                        </p>
+                                        <p class="card-text">
+                                            <span>Sender’s address:</span>
+                                            <span style="margin-left: 10px;"><t t-esc="order.from_address"/></span>
+                                        </p>
+                                    </div>
+                                    <div class="inforcustomer-receiver" style="width: 50%;">
+                                        <p class="card-text">
+                                            <span>Receiver’s name:</span>
+                                            <span style="margin-left: 10px;"><t t-esc="order.receiver_name"/></span>
+                                        </p>
+                                        <p class="card-text">
+                                            <span>Receiver’s phone:</span>
+                                            <span style="margin-left: 10px;"><t t-esc="order.receiver_phone"/></span>
+                                        </p>
+                                        <p class="card-text">
+                                            <span>Receiver’s address:</span>
+                                            <span style="margin-left: 10px;"><t t-esc="order.to_address"/></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-table" style="margin-top:20px;">
+                            <table class="table table-bordered">
+                                <thead style="background-color:#fecb2f;">
+                                    <tr>
+                                        <th>Package Name</th>
+                                        <th>Weight (kg)</th>
+                                        <th>Dimensions (cm) (LxWxH)</th>
+                                        <th>Shipment value (VND)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="product_body" t-foreach="products" t-as="product">
+                                    <tr>
+                                        <td><t t-esc="product.product_name"/></td>
+                                        <td><t t-esc="product.weight"/></td>
+                                        <td><t t-esc="product.dimensions"/></td>
+                                        <td>
+                                            <t t-esc="'{:,}'.format(int(product.shipment_value)) + ' VND'"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th style="font-weight: bold">Total</th>
+                                        <th id="total_weight" name="total_weight"><t t-esc="order.total_weight"/></th>
+                                        <th></th>
+                                        <th id="total_shipment_value" name="total_shipment_value"><t t-esc="'{:,}'.format(int(order.total_shipment_value)) + ' VND'"/></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="map-container"  style="margin-top: 20px; margin-bottom:20px;">
+                            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+                            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+                            <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+                            <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+                            <script src="custom_website/static/src/js/order_detail.js"></script>
+
+                            <div id="map" style="width: 100%;height: 300px;position: relative;"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 offset-md-1">
+                        <div class="card" style="margin-top:20px;">
+                            <div class="card-body">
+                                <h5 class="card-title"><strong>Shipping Fees</strong></h5>
+                                <hr/>
+                                <p class="card-text">
+                                    <span style="font-weight: 400;">Shipping Fee:</span>
+                                    <span style="position: absolute; right: 0;margin-right: 10px;color:red;"><t t-esc="'{:,}'.format(int(order.shipping_fee)) + ' VND'"/></span>
+                                </p>
+                                <p class="card-text">
+                                    <span style="font-weight: 400;">Promotion Discount (VND):</span>
+                                    <span style="position: absolute; right: 0;margin-right: 10px;color:blue;"><t t-esc="'{:,}'.format(int(order.promotion_discount)) + ' VND'"/></span>
+                                </p>
+                                <p class="card-text">
+                                    <span style="font-weight: 400;">Service Fee (VND):</span>
+                                    <span style="position: absolute; right: 0;margin-right: 10px;color:red;"><t t-esc="'{:,}'.format(int(order.service_fee)) + ' VND'"/></span>
+                                </p>
+                                <p class="card-text">
+                                    <span style="font-weight: 400;">Total Fee (VND):</span>
+                                    <span style="position: absolute; right: 0;margin-right: 10px;color:red;"><t t-esc="'{:,}'.format(int(order.total_fee)) + ' VND'"/></span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card" style="margin-top:20px;">
+                            <div class="card-body">
+                                <h5 class="card-title"><strong>Shipper Infomation</strong></h5>
+                                <hr/>
+                                <!-- <p class="card-text">
+                                    <span style="font-weight: 400;">Driver Name:</span>
+                                    <span style="position: absolute; right: 0;margin-right: 10px;"><t t-esc="order.driver_pickup_name"/></span>
+                                </p>
+                                <p class="card-text">
+                                    <span style="font-weight: 400;">Driver Phone:</span>
+                                    <span style="position: absolute; right: 0;margin-right: 10px;"><t t-esc="order.driver_pickup_phone"/></span>
+                                </p> -->
+                                <hr/>
+                                <p class="card-text">
+                                    <span style="font-weight: 400;">Estimated Pickup Date:</span>
+                                    <span style="position: absolute; right: 0;margin-right: 10px;"><t t-esc="order.estimated_pickup_date"/></span>
+                                </p>
+                                <p class="card-text">
+                                    <span style="font-weight: 400;">Estimated Delivery Date:</span>
+                                    <span style="position: absolute; right: 0;margin-right: 10px;"><t t-esc="order.estimated_delivery_date"/></span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card" style="margin-top:20px;margin-bottom:20px;">
+                            <div class="card-body">
+                                <h5 class="card-title"><strong>Log Information</strong></h5>
+                                <hr/>
+                                <td>
+                                    <t t-if="order.ship_image">
+                                        <div class="mb-3">
+                                            <a t-att-href="'/order/%s/pic_log' % order.id" target="_blank">
+                                                <img t-att-src="'data:image/png;base64,' + order.ship_image.decode('utf-8')"
+                                                    class="img-fluid" alt="Order Image" />
+                                            </a>
+                                        </div>
+                                    </t>
+                                </td>
+                                <hr/>
+                                <div id="logContainer">
+                                    <t t-foreach="logs" t-as="log">
+                                        <div class="log-entry" style="display: none;">
+                                            <p style="display: flex; justify-content: space-between; align-items: center;">
+                                                <span>
+                                                    <strong>Date:</strong> 
+                                                    <t t-esc="log.get('date')" t-if="log.get('date')"/>
+                                                </span>
+                                                <span><t t-esc="log.get('body')"/></span>
+                                            </p>
+                                            <hr/>
+                                        </div>
+                                    </t>
+                                </div>
+                                <button id="viewMoreBtn" class="btn btn-primary" onclick="toggleLogs()">View More</button>
+                            </div>
+                        </div>
+
+                        <script>
+                            let isExpanded = false;
+
+                            function toggleLogs() {
+                                const logs = document.querySelectorAll('.log-entry');
+                                isExpanded = !isExpanded; // Đảo trạng thái trước
+
+                                logs.forEach((log, index) => {
+                                    if (index === 0) {
+                                        log.style.display = 'block';
+                                    } else {
+                                        log.style.display = isExpanded ? 'block' : 'none';
+                                    }
+                                });
+                                
+                                document.getElementById('viewMoreBtn').textContent = isExpanded ? 'Collapse' : 'View More';
+                            }
+
+                            document.addEventListener('DOMContentLoaded', () => {
+                                const logs = document.querySelectorAll('.log-entry');
+                                logs.forEach((log, index) => {
+                                    log.style.display = index === 0 ? 'block' : 'none';
+                                });
+                            });
+                        </script>
+                    </div>
+                    
+                    <a href="/tracking_order" class="btn btn-primary" style="margin-bottom:20px;width:10%;">Back to Orders</a>
+                    <a t-if="order.status == 'new'" t-attf-href="/cancel_order/#{order.id}" class="btn btn-danger" style="margin-bottom:20px;width:10%;margin-left: 10px;">Cancel Order</a>    
+                    <a t-if="order.status == 'new'" t-attf-href="/print_order/#{order.id}" class="btn btn-primary" style="margin-bottom:20px;width:10%;margin-left: 10px;">Print Order</a>    
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <record id="view_shipping_order_graph" model="ir.ui.view">
+        <field name="name">shipping.order.graph</field>
+        <field name="model">shipping.order</field>
+        <field name="arch" type="xml">
+            <graph string="Shipping Order Status Statistics" type="pie">
+                <field name="status" type="row"/>
+                <field name="create_date" interval="month"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_orders" model="ir.actions.act_window">
+        <field name="name">Orders</field>
+        <field name="res_model">shipping.order</field>
+        <field name="view_mode">tree,form,graph</field>
+    </record>
+
+    <record model="ir.actions.server" id="action_update_pickup_driver">
+        <field name="name">Assign Driver</field>
+        <field name="model_id" ref="custom_website.model_shipping_order"/>
+        <field name="binding_model_id" ref="custom_website.model_shipping_order"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = {
+                'type': 'ir.actions.act_window',
+                'res_model': 'pickup.driver.wizard',
+                'view_mode': 'form',
+                'target': 'new',
+                'context': {
+                    'default_driver_pickup_id': False,
+                    'active_ids': env.context.get('active_ids', []),
+                }
+            }
+        </field>
+    </record>
+
+    <menuitem id="menu_shipping_order_root" name="Shipping Orders" sequence="1" groups="base.group_user"/>
+    <menuitem id="menu_orders" name="Orders" parent="menu_shipping_order_root" action="action_orders" sequence="1"/>
+    <menuitem id="menu_drivers" name="Drivers" parent="menu_shipping_order_root" action="action_drivers" sequence="2"/>
+</odoo>

@@ -1,0 +1,7 @@
+<odoo>
+    <template id="custom_website_template" inherit_id="website.layout" name="Custom Website Template">
+        <xpath expr="//div[contains(@class, 'oe_structure')]" position="inside">
+            <button id="call_api_button" class="btn btn-primary call_api_button">Call API</button>
+        </xpath>
+    </template>
+</odoo>

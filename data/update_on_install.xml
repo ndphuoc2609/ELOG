@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- <function 
+            model="stock.picking.type" 
+            name="update_show_entire_packs"
+        /> -->
+        <!-- <function 
+            model="stock.warehouse" 
+            name="create_users_for_warehouses"
+        /> -->
+        <function 
+            model="stock.location" 
+            name="update_transit"
+        />
+        <function 
+            model="website" 
+            name="update_signup"
+        />
+    </data>
+</odoo>

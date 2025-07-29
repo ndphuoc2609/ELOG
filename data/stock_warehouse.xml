@@ -1,0 +1,243 @@
+<odoo>
+    <data noupdate="1">
+        <record id="stock_warehouse_operation_hn1" model="stock.warehouse">
+            <field name="name">Hà Nội</field>
+            <field name="code">HN1</field>
+            <field name="latitude">21.028511</field>
+            <field name="longitude">105.804817</field>
+            <field name="address">Hà Nội, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_bn" model="stock.warehouse">
+            <field name="name">Bắc Ninh</field>
+            <field name="code">BN</field>
+            <field name="latitude">21.186082</field>
+            <field name="longitude">106.07643</field>
+            <field name="address">Bắc Ninh, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_qn2" model="stock.warehouse">
+            <field name="name">Quảng Ninh</field>
+            <field name="code">QN2</field>
+            <field name="latitude">21.006382</field>
+            <field name="longitude">107.292514</field>
+            <field name="address">Quảng Ninh, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_hp" model="stock.warehouse">
+            <field name="name">Hải Phòng</field>
+            <field name="code">HP</field>
+            <field name="latitude">20.844911</field>
+            <field name="longitude">106.688087</field>
+            <field name="address">Hải Phòng, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_hy" model="stock.warehouse">
+            <field name="name">Hưng Yên</field>
+            <field name="code">HY</field>
+            <field name="latitude">20.852571</field>
+            <field name="longitude">106.017656</field>
+            <field name="address">Hưng Yên, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_nb" model="stock.warehouse">
+            <field name="name">Ninh Bình</field>
+            <field name="code">NB</field>
+            <field name="latitude">20.250614</field>
+            <field name="longitude">105.974453</field>
+            <field name="address">Ninh Bình, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_cb" model="stock.warehouse">
+            <field name="name">Cao Bằng</field>
+            <field name="code">CB</field>
+            <field name="latitude">22.665712</field>
+            <field name="longitude">106.257887</field>
+            <field name="address">Cao Bằng, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_tq" model="stock.warehouse">
+            <field name="name">Tuyên Quang</field>
+            <field name="code">TQ</field>
+            <field name="latitude">21.823009</field>
+            <field name="longitude">105.214267</field>
+            <field name="address">Tuyên Quang, Việt Nam</field>
+        </record>   
+        <record id="stock_warehouse_operation_lc1" model="stock.warehouse">
+            <field name="name">Lào Cai</field>
+            <field name="code">LC1</field>
+            <field name="latitude">22.480943</field>
+            <field name="longitude">103.970524</field>
+            <field name="address">Lào Cai, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_tn1" model="stock.warehouse">
+            <field name="name">Thái Nguyên</field>
+            <field name="code">TN1</field>
+            <field name="latitude">21.567155</field>
+            <field name="longitude">105.825203</field>
+            <field name="address">Thái Nguyên, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_ls" model="stock.warehouse">
+            <field name="name">Lạng Sơn</field>
+            <field name="code">LS</field>
+            <field name="latitude">21.85264</field>
+            <field name="longitude">106.761518</field>
+            <field name="address">Lạng Sơn, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_pt" model="stock.warehouse">
+            <field name="name">Phú Thọ</field>
+            <field name="code">PT</field>
+            <field name="latitude">21.345009</field>
+            <field name="longitude">105.251946</field>
+            <field name="address">Phú Thọ, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_db" model="stock.warehouse">
+            <field name="name">Điện Biên</field>
+            <field name="code">DB</field>
+            <field name="latitude">21.386025</field>
+            <field name="longitude">103.023009</field>
+            <field name="address">Điện Biên, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_lc" model="stock.warehouse">
+            <field name="name">Lai Châu</field>
+            <field name="code">LC</field>
+            <field name="latitude">22.386223</field>
+            <field name="longitude">103.470263</field>
+            <field name="address">Lai Châu, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_sl" model="stock.warehouse">
+            <field name="name">Sơn La</field>
+            <field name="code">SL</field>
+            <field name="latitude">21.325785</field>
+            <field name="longitude">103.918475</field>
+            <field name="address">Sơn La, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_th" model="stock.warehouse">
+            <field name="name">Thanh Hóa</field>
+            <field name="code">TH</field>
+            <field name="latitude">19.807942</field>
+            <field name="longitude">105.776758</field>
+            <field name="address">Thanh Hóa, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_na" model="stock.warehouse">
+            <field name="name">Nghệ An</field>
+            <field name="code">NA</field>
+            <field name="latitude">19.234249</field>
+            <field name="longitude">104.920036</field>
+            <field name="address">Nghệ An, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_ht" model="stock.warehouse">
+            <field name="name">Hà Tĩnh</field>
+            <field name="code">HT</field>
+            <field name="latitude">18.337521</field>
+            <field name="longitude">105.905693</field>
+            <field name="address">Hà Tĩnh, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_qt" model="stock.warehouse">
+            <field name="name">Quảng Trị</field>
+            <field name="code">QT</field>
+            <field name="latitude">16.818859</field>
+            <field name="longitude">107.097164</field>
+            <field name="address">Quảng Trị, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_tth" model="stock.warehouse">
+            <field name="name">Huế</field>
+            <field name="code">TTH</field>
+            <field name="latitude">16.463713</field>
+            <field name="longitude">107.590866</field>
+            <field name="address">Huế, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_dn" model="stock.warehouse">
+            <field name="name">Đà Nẵng</field>
+            <field name="code">DN</field>
+            <field name="latitude">16.047079</field>
+            <field name="longitude">108.20623</field>
+            <field name="address">Đà Nẵng, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_qn1" model="stock.warehouse">
+            <field name="name">Quảng Ngãi</field>
+            <field name="code">QN1</field>
+            <field name="latitude">15.120152</field>
+            <field name="longitude">108.79226</field>
+            <field name="address">Quảng Ngãi, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_kh" model="stock.warehouse">
+            <field name="name">Khánh Hòa</field>
+            <field name="code">KH</field>
+            <field name="latitude">12.259821</field>
+            <field name="longitude">109.052397</field>
+            <field name="address">Khánh Hòa, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_gl" model="stock.warehouse">
+            <field name="name">Gia Lai</field>
+            <field name="code">GL</field>
+            <field name="latitude">13.807894</field>
+            <field name="longitude">108.109375</field>
+            <field name="address">Gia Lai, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_dl" model="stock.warehouse">
+            <field name="name">Đắk Lắk</field>
+            <field name="code">DL</field>
+            <field name="latitude">12.710011</field>
+            <field name="longitude">108.237751</field>
+            <field name="address">Đắk Lắk, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_ld" model="stock.warehouse">
+            <field name="name">Lâm Đồng</field>
+            <field name="code">LD</field>
+            <field name="latitude">11.575279</field>
+            <field name="longitude">108.142866</field>
+            <field name="address">Lâm Đồng, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_tn" model="stock.warehouse">
+            <field name="name">Tây Ninh</field>
+            <field name="code">TN</field>
+            <field name="latitude">11.354568</field>
+            <field name="longitude">106.140259</field>
+            <field name="address">Tây Ninh, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_dn2" model="stock.warehouse">
+            <field name="name">Đồng Nai</field>
+            <field name="code">DN2</field>
+            <field name="latitude">10.945272</field>
+            <field name="longitude">106.824516</field>
+            <field name="address">Đồng Nai, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_hcm" model="stock.warehouse">
+            <field name="name">Hồ Chí Minh</field>
+            <field name="code">HCM</field>
+            <field name="latitude">10.776889</field>
+            <field name="longitude">106.700806</field>
+            <field name="address">TP Hồ Chí Minh, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_vl" model="stock.warehouse">
+            <field name="name">Vĩnh Long</field>
+            <field name="code">VL</field>
+            <field name="latitude">10.253891</field>
+            <field name="longitude">105.972222</field>
+            <field name="address">Vĩnh Long, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_dt" model="stock.warehouse">
+            <field name="name">Đồng Tháp</field>
+            <field name="code">DT</field>
+            <field name="latitude">10.493798</field>
+            <field name="longitude">105.688178</field>
+            <field name="address">Đồng Tháp, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_ag" model="stock.warehouse">
+            <field name="name">An Giang</field>
+            <field name="code">AG</field>
+            <field name="latitude">10.521583</field>
+            <field name="longitude">105.125895</field>
+            <field name="address">An Giang, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_ct" model="stock.warehouse">
+            <field name="name">Cần Thơ</field>
+            <field name="code">CT</field>
+            <field name="latitude">10.045162</field>
+            <field name="longitude">105.746857</field>
+            <field name="address">Cần Thơ, Việt Nam</field>
+        </record>
+        <record id="stock_warehouse_operation_cm" model="stock.warehouse">
+            <field name="name">Cà Mau</field>
+            <field name="code">CM</field>
+            <field name="latitude">9.152672</field>
+            <field name="longitude">105.196079</field>
+            <field name="address">Cà Mau, Việt Nam</field>
+        </record>
+
+    </data>
+</odoo>

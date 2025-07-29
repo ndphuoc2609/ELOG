@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="owl.shipping_dashboard" owl="1">
+        <div class="vh-100 overflow-auto bg-muted">
+            <div class="row m-3">
+                <div class="col-lg-7">
+                    <div class="row">
+                        <div class="col m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h1 class="text-primary fw-bold">Shipping Dashboard</h1>
+                                    <div class="position-relative" style="min-width:250px;">
+                                        <div class="input-group">
+                                            <input type="text"
+                                                class="form-control"
+                                                placeholder="Search warehouse..."
+                                                t-model="state.warehouseSearch"
+                                                t-on-input="onWarehouseSearch"
+                                                t-on-focus="onWarehouseFocus"
+                                                t-on-blur="onWarehouseBlur"
+                                                autocomplete="off"
+                                            />
+                                            <button t-if="state.selectedWarehouse || state.warehouseSearch"
+                                                class="btn btn-outline-secondary"
+                                                type="button"
+                                                t-on-click="clearWarehouse">
+                                                <i class="fa fa-times"/>
+                                            </button>
+                                        </div>
+                                        <ul t-if="state.showWarehouseDropdown &amp;&amp; filteredWarehouses.length"
+                                            class="list-group position-absolute w-100 shadow"
+                                            style="z-index:10; max-height:200px; overflow:auto;">
+                                            <li class="list-group-item"
+                                                t-foreach="filteredWarehouses"
+                                                t-as="wh"
+                                                t-key="wh.id"
+                                                t-on-mousedown="selectWarehouse.bind(this, wh)">
+                                                <t t-esc="wh.name"/>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <select class="form-select" t-on-change="onPeriodChange">
+                                            <option value="0">Today</option>
+                                            <option value="7">Last 7 Days</option>
+                                            <option value="30">Last 30 Days</option>
+                                            <option value="90">Last 90 Days</option>
+                                            <option value="365">Last 365 Days</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <KpiCard name="'Total shipments'" value="state.total_shipments"/>
+                        <KpiCard name="'Pickup Progress'" value="state.pickup_progress"/>
+                        <KpiCard name="'Delivery Progress'" value="state.delivery_progress"/>
+                        <KpiCard name="'Total Fees'" value="state.total_fees"/>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Order Status</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white"/>
+                                    </div>
+                                </div>
+                                <ChartRenderer
+                                    type="'pie'"
+                                    title="'Order Status by Pickup Status'"
+                                    chartData="state.orderStatusChart"
+                                />
+                            </div>
+                        </div>
+                        <!-- <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Top Sales People</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white"/>
+                                    </div>
+                                </div>
+                                <ChartRenderer type="'pie'" title="'Top Sales People Report'"/>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+                <!-- <div class="col-lg-5">
+                    <div class="row">
+                        <div class="col m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Monthly Sales</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white"/>
+                                    </div>
+                                </div>
+                                <ChartRenderer type="'bar'" title="'Monthly Sales Report'"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Partner Orders</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white"/>
+                                    </div>
+                                </div>
+                                <ChartRenderer type="'line'" title="'Partner Orders Report'"/>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </t>
+</templates>

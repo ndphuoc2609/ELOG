@@ -1,0 +1,20 @@
+<odoo>
+    <data>
+        <record id="view_pickup_driver_wizard" model="ir.ui.view">
+            <field name="name">pickup.driver.wizard.form</field>
+            <field name="model">pickup.driver.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Assign Pickup Driver">
+                    <group>
+                        <field name="driver_pickup_id" required="false"/>
+                        <field name="driver_delivery_id" required="false"/>
+                    </group>
+                    <footer>
+                        <button string="Assign" type="object" name="assign_driver" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

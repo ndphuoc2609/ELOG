@@ -1,0 +1,24 @@
+<odoo>
+    <template id="login" inherit_id="web.login" name="Custom Login" >
+        <xpath expr="//div[hasclass('field-login')]" position="replace">
+            <div class="mb-3 field-login">
+                <div class="form-group field-contact-no"> 
+                    <label for="login" class="form-label">Email / Phone Number</label>
+                </div>
+                <input type="text" placeholder="Email / Phone Number" name="login" id="login" required="required" autocomplete="username" autofocus="autofocus" autocapitalize="off" class="form-control "></input>
+            </div>
+        </xpath>
+        <xpath expr="//t[@t-esc='error']" position="replace">
+            <t t-raw="error"/>
+        </xpath>
+   </template>
+
+   <template id="signup_login" inherit_id="auth_signup.login" name="Custom Login" >
+        <xpath expr="//div[hasclass('justify-content-between')]" position="replace">
+            <div class="justify-content-between mt-2 d-flex small">
+                <a t-if="signup_enabled" t-attf-href="/web/signup">Don't have an account?</a>
+                <a t-if="reset_password_enabled" t-attf-href="/web/reset_password">Reset Password</a>
+            </div>
+        </xpath>
+    </template>
+</odoo>

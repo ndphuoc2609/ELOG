@@ -1,0 +1,188 @@
+<odoo>
+    <template id="print_order_template">
+        <style>
+            @font-face {
+                font-family: 'DejaVu Sans';
+                src: url('/path/to/DejaVuSans.ttf') format('truetype');
+            }
+            .invoice {
+                font-family: 'DejaVu Sans', Arial, sans-serif;
+            }
+            .invoice {
+                <!-- width: 105.6mm;
+                height: 203.2mm;
+                border: 1px solid #ccc; -->
+                margin: 0 auto;
+                background: #fff;
+                font-family: Arial, sans-serif;
+                font-size: 13px;
+                padding: 10px 18px 10px 18px;
+                <!-- box-sizing: border-box; -->
+                position: relative;
+            }
+            .title {
+                text-align: center;
+                color: #d40511;
+                font-size: 20px;
+                margin-bottom: 8px;
+                font-weight: bold;
+            }
+            .order_id_barcode {
+                display: grid;
+                margin-top: 40px;
+            }
+            .info-container {
+                <!-- display: -webkit-box;
+                -webkit-box-pack: justify; -->
+                margin-bottom: 10px; 
+                font-size: 20px;
+                <!-- margin-right: 10px; -->
+            }
+            .footer-img {
+                display: -webkit-box;
+                -webkit-box-pack: justify;
+                margin-bottom: 10px; 
+            }
+            .seller-info, .buyer-info {
+                border: 1px solid ;
+                padding: 6px;
+                margin-bottom: 8px;
+                border-radius: 3px;
+            }
+
+            .content h2 {
+                font-size: 18px;
+                margin: 8px 0 4px 0;
+                font-weight: bold;
+            }
+            .product-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 8px;
+            }
+            .product-table th, .product-table td {
+                border: 1px solid #ccc;
+                padding: 3px 5px;
+                text-align: left;
+                font-size: 14px;
+            }
+            .product-table th {
+                background: #f7f7f7;
+            }
+            .footer {
+                margin-top: 10px;
+                font-size: 13px;
+                font-size: 16px;
+            }
+            .barcode {
+                text-align: right;
+                margin-bottom: 6px;
+            }
+            .order-id {
+                font-size: 18px;
+                font-weight: bold;
+                text-align: center;
+                margin: 8px 0;
+                letter-spacing: 2px;
+            }
+            .qr-section {
+                text-align: center;
+                margin: 8px 0;
+            }
+            .amount {
+                font-size: 16px;
+                font-weight: bold;
+                text-align: right;
+                margin-top: 8px;
+            }
+            .note {
+                font-size: 11px;
+                margin-top: 6px;
+            }
+            .qr_footer_sign {
+                text-align: center;
+                display: -webkit-box;
+                -webkit-box-pack: justify;
+                margin-bottom: 10px;
+            }
+        </style>
+        <div class="invoice" id="invoice">
+            <link rel="preconnect" href="https://fonts.googleapis.com"/>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+            <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39+Extended+Text&amp;display=swap" rel="stylesheet"/>
+            <div class="footer-img">
+                <div class="order_id_barcode">
+                    <span style="font-family: 'Libre Barcode 39 Extended Text';font-size: 40px;margin-top: 30px; -webkit-transform: scaleY(2); display: inline-block; line-height: 40px; margin-bottom: 20px;">*<t t-esc="order.order_id"/>*</span>
+                </div>
+            </div>
+            <div class="info-container">
+                <div class="seller-info">
+                    <strong>Từ:</strong><br/>
+                    <span t-esc="sender_info['name']"/><br/>
+                    <span t-esc="sender_info['phone']"/><br/>
+                    <span t-esc="sender_info['address']"/>
+                </div>
+                <div class="buyer-info">
+                    <strong>Đến:</strong><br/>
+                    <span t-esc="receiver_info['name']"/><br/>
+                    <span t-esc="receiver_info['phone']"/><br/>
+                    <span t-esc="receiver_info['address']"/>
+                </div>
+            </div>
+            <div class="piece" style="font-size: 16px;">
+                <t t-foreach="product" t-as="prod">
+                    <p><strong>STT:</strong> <t t-esc="prod['piece']"/> / <t t-esc="pieces"/></p>
+                </t>
+            </div>
+            <div class="content">
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>Nội dung hàng</th>
+                            <th>Thể tích</th>
+                            <th>Trọng lượng</th>
+                            <th>Giá trị hàng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="product" t-as="prod">
+                            <tr>
+                                <td><t t-esc="prod['name']"/></td>
+                                <td><t t-esc="prod['dimensions']"/></td>
+                                <td><t t-esc="prod['weight']"/></td>
+                                <td><t t-esc="prod['shipment_value']"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+            <div class="tracking-number" style="text-align: right;">
+                <t t-foreach="product" t-as="prod">
+                    <span style="font-family: 'Libre Barcode 39 Extended Text';font-size: 40px;margin-top: 30px; -webkit-transform: scaleY(2); display: inline-block; line-height: 40px; margin-bottom: 20px;">*<t t-esc="prod['barcode']"/>*</span>
+                </t>
+            </div>
+            <div class="footer">
+                <p><strong>Ngày tạo đơn:</strong> <t t-esc="order_date"/></p>
+                <div>
+                    <p><strong>Tiền thu người nhận:</strong></p>
+                    <div class="amount" style="font-size: 25px;">
+                        <t t-esc="total_fee"/> VND
+                    </div>
+                </div>
+            </div>
+            <div class="qr_footer_sign">
+                <!-- <img t-att-src="'https://api.qrserver.com/v1/create-qr-code/?data=%s&amp;size=120x120' % order.order_id" width="90" height="90" style="display:inline-block;" alt="QR Code"/> -->
+                <div style="border: 1px solid #ccc; padding: 5px; margin-top: 5px; font-size: 12px;width: 180px; height: 80px; display: flex; justify-content: center; margin-right: 10px;">
+                    <span>Ghi chú giao hàng.</span>
+                </div>
+                <div style="border: 1px solid #ccc; padding: 5px; margin-top: 5px; font-size: 12px;width: 200px; height: 80px; display: flex; justify-content: center;">
+                    <span>Chữ ký nhận hàng.</span>
+                </div>
+            </div>
+            <div class="note">
+                <span>Lưu ý: Kiểm tra kỹ thông tin trước khi giao hàng.</span><br/>
+            </div>
+        </div>
+        <!-- <div style = "display:block; clear:both; page-break-after:always;"></div> -->
+    </template>
+</odoo>

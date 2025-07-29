@@ -1,0 +1,26 @@
+<odoo>
+    <data>
+        <record id="shipping_order_transport_form" model="ir.ui.view">
+            <field name="name">shipping.order.transport.form</field>
+            <field name="model">shipping.order.transport</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="shipping_order_id"/>
+                            <field name="shift_id"/>
+                            <field name="shift_start"/>
+                            <field name="type"/>
+                        </group>
+                        <group>
+                            <field name="from_location"/>
+                            <field name="to_location"/>
+                            <field name="shift_end"/>
+                            <field name="state"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

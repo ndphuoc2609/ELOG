@@ -1,0 +1,14 @@
+<odoo>   
+    <record id="stock_picking_search_inherit_order_id" model="ir.ui.view">
+        <field name="name">stock.picking.search.inherit.order_id</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_pickingtype_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="company_id" string="Order ID"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+
+  
