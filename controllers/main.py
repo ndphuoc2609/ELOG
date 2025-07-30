@@ -12,6 +12,7 @@ import pdfkit
 import io
 import zipfile
 import re
+from markupsafe  import Markup
 
 locale.setlocale(locale.LC_ALL, 'vi_VN.UTF-8')
 
@@ -206,7 +207,7 @@ class CustomController(http.Controller):
                 'barcode': p.barcode,
                 'weight': p.weight,
                 'dimensions': p.dimensions,
-                'shipment_value': p.shipment_value,
+                'shipment_value': "{:,.0f}".format(p.shipment_value),
             })
 
         def mask_data(data, visible_chars, suffix=True):
@@ -234,39 +235,44 @@ class CustomController(http.Controller):
         #     'total_fee': f"{order.total_fee:,.0f}",
         # })
         
-        # Tạo file ZIP trong bộ nhớ
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, "w") as zip_file:
-            for product in list_product:
-                html = http.request.env['ir.ui.view'].sudo()._render_template(
-                    'custom_website.print_order_template',
-                    {
-                        'order': order,
-                        'sender_info': sender_info,
-                        'receiver_info': receiver_info,
-                        'pieces': len(list_product),
-                        'product': [product],
-                        'order_date': order.create_order_date + datetime.timedelta(hours=7),
-                        'total_fee': f"{order.total_fee:,.0f}",
-                    }
-                )
-                options = {
-                    'page-width': '105.6mm',
-                    'page-height': '203.2mm',
-                    'encoding': "UTF-8",
-                    'margin-top': '0mm',
-                    'margin-bottom': '0mm',
-                    'margin-left': '0mm',
-                    'margin-right': '0mm',
+        full_html = ""
+        for i, product in enumerate(list_product):
+            # Render template cho từng sản phẩm
+            html = http.request.env['ir.ui.view'].sudo()._render_template(
+                'custom_website.print_order_template',
+                {
+                    'order': order,
+                    'sender_info': sender_info,
+                    'receiver_info': receiver_info,
+                    'pieces': len(list_product),
+                    'product': [product],
+                    'order_date': order.create_order_date + datetime.timedelta(hours=7),
+                    'total_fee': f"{order.total_fee:,.0f}",
                 }
-                pdf = pdfkit.from_string(html, False, options=options)
-                filename = f"package_{product['barcode']}.pdf"
-                zip_file.writestr(filename, pdf)
-        zip_buffer.seek(0)
-        zip_filename = f"order_{order.order_id}_packages.zip"
-        return http.request.make_response(zip_buffer.read(), headers=[
-            ('Content-Type', 'application/zip'),
-            ('Content-Disposition', f'attachment; filename="{zip_filename}"')
+            )
+            
+            # Thêm page break sau mỗi sản phẩm (trừ sản phẩm cuối cùng)
+            full_html += html
+            if i < len(list_product) - 1:
+                full_html += Markup('<div style="page-break-before: always;"></div>')
+
+        # Tạo PDF từ HTML đã gom
+        options = {
+            'page-width': '105.6mm',
+            'page-height': '203.2mm',
+            'encoding': "UTF-8",
+            'margin-top': '0mm',
+            'margin-bottom': '0mm',
+            'margin-left': '0mm',
+            'margin-right': '0mm',
+        }
+        
+        pdf = pdfkit.from_string(full_html, False, options=options)
+        pdf_filename = f"order_{order.order_id}_all_packages.pdf"
+        
+        return http.request.make_response(pdf, headers=[
+            ('Content-Type', 'application/pdf'),
+            ('Content-Disposition', f'attachment; filename="{pdf_filename}"')
         ])
 
     @http.route('/get_order_logs/<string:order_id>', type='http', auth='public', methods=['GET'])

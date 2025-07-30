@@ -183,8 +183,16 @@
         <field name="sequence">11</field>
     </record>
 
-    <template id="main_page_template" name="Main Page">
+    <template id="main_layout" name="Main Layout">
         <t t-call="website.layout">
+            <!-- <t t-set="no_header" t-value="True"/> -->
+            <t t-set="no_footer" t-value="True"/>
+            <t t-out="0"/>
+        </t>
+    </template>
+
+    <template id="main_page_template" name="Main Page">
+        <t t-call="custom_website.main_layout">
             <section class="s_banner" data-snippet="s_banner"
                          style="height: 100%; background-image: url(&quot;https://www.dhl.com/content/dam/dhl/global/core/images/marketing-stage-2730x1120/employee-receives-customer-signature-0001.web.1365.428.jpg&quot;); background-size: cover; background-position: 80% 20%">
                 <div class="container py-5">
