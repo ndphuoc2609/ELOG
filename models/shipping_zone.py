@@ -5,9 +5,7 @@ class ShippingZone(models.Model):
     _description = 'Driver Working Zone'
 
     name = fields.Char("Name", required=True)
-    latitude = fields.Char("Latitude", required=True)
-    longitude = fields.Char("Longitude", required=True)
-    radius = fields.Integer("Radius (km)", required=True, default=100)
+    area = fields.Char("Area", required=True)
     role_id = fields.Many2one('planning.role', string="Role")
     transports = fields.One2many('shipping.order.transport', 'driver_id', compute='_compute_transports', compute_sudo=True)
 
@@ -16,6 +14,7 @@ class ShippingZone(models.Model):
             transports = self.env['shipping.order.transport'].search([('zone_id', '=', zone.id)])
             zone.transports = transports
 
+    @api.model
     def create(self, vals):
         # create new role for the zone
         role = self.env['planning.role'].create({'name': f'{vals["name"]} driver'})
@@ -35,3 +34,9 @@ class ShippingZone(models.Model):
         })
         vals['role_id'] = role.id
         return super(ShippingZone, self).create(vals)
+
+    def write(self, vals):
+        if vals.get('name'):
+            role = self.role_id
+            role.write({'name': f'{vals["name"]} driver'})
+        return super().write(vals)

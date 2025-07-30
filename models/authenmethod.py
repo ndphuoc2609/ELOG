@@ -71,7 +71,7 @@ class ResUsers(models.Model):
         else:
             self.sudo().write({'failed_login_attempts': self.failed_login_attempts + 1})
 
-    def send_push_notification(self, body, order_id=None):
+    def send_push_notification(self, body):
         # if self.push_token == "":
         #     raise Warning("Driver push token haven't set yet.")
         url = "https://exp.host/--/api/v2/push/send"
@@ -80,12 +80,12 @@ class ResUsers(models.Model):
             "title": "DHL express",
             "body": body,
         }
-        if order_id:
-            data["data"] = {"url": f"/order-detail?id={order_id}"}
 
         response = requests.post(url, json=data)
+        print(f"send_push_notification: {response.json()}")
         # if response.status_code != 200:
         #     raise Warning(f"Failed to send push notification: {response.text}.")
+        return response
 
     def send_sms(self, content, phone=None):
         twilio_sid = "AC73b199b33d2850372551bea0cd64864e"
@@ -101,6 +101,7 @@ class ResUsers(models.Model):
         auth = HTTPBasicAuth(twilio_sid, twilio_token)
 
         response = requests.post(url, data=data, auth=auth)
+        print(f"send_sms: {response.json()}")
         return response
     
     def action_reset_login(self):

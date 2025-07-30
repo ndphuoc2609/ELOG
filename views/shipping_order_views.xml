@@ -135,6 +135,7 @@
                 <field name="current_driver_name" string="Driver Name" />
                 <field name="current_driver_phone" string="Driver Phone" />
                 <field name="package_location"/>
+                <field name="next_location"/>
                 <field name="status"  optional="show" widget="badge" 
                     decoration-warning="status == 'waiting'"
                     decoration-success="status == 'delivered'" 
@@ -159,6 +160,9 @@
                 <group expand="0" string="Group By">
                     <filter string="Driver Name" name="groupby_current_driver_name" domain="[]" context="{'group_by': 'current_driver_name'}"/>
                     <filter string="Driver Phone" name="groupby_current_driver_phone" domain="[]" context="{'group_by': 'current_driver_phone'}"/>
+                    <filter string="Package Location" name="groupby_package_location" domain="[]" context="{'group_by': 'package_location'}"/>
+                    <filter string="Next Location" name="groupby_next_location" domain="[]" context="{'group_by': 'next_location'}"/>
+                    <filter string="Status" name="groupby_status" domain="[]" context="{'group_by': 'status'}"/>
                 </group>
 
             </search>
@@ -179,16 +183,8 @@
         <field name="sequence">11</field>
     </record>
 
-    <template id="main_layout" name="Main Layout">
-        <t t-call="website.layout">
-            <!-- <t t-set="no_header" t-value="True"/> -->
-            <t t-set="no_footer" t-value="True"/>
-            <t t-out="0"/>
-        </t>
-    </template>
-
     <template id="main_page_template" name="Main Page">
-        <t t-call="custom_website.main_layout">
+        <t t-call="website.layout">
             <section class="s_banner" data-snippet="s_banner"
                          style="height: 100%; background-image: url(&quot;https://www.dhl.com/content/dam/dhl/global/core/images/marketing-stage-2730x1120/employee-receives-customer-signature-0001.web.1365.428.jpg&quot;); background-size: cover; background-position: 80% 20%">
                 <div class="container py-5">
@@ -1036,7 +1032,7 @@
         <field name="view_mode">tree,form,graph</field>
     </record>
 
-    <record model="ir.actions.server" id="action_update_pickup_driver">
+    <record model="ir.actions.server" id="action_assign_driver">
         <field name="name">Assign Driver</field>
         <field name="model_id" ref="custom_website.model_shipping_order"/>
         <field name="binding_model_id" ref="custom_website.model_shipping_order"/>
@@ -1044,11 +1040,10 @@
         <field name="code">
             action = {
                 'type': 'ir.actions.act_window',
-                'res_model': 'pickup.driver.wizard',
+                'res_model': 'assign.driver.wizard',
                 'view_mode': 'form',
                 'target': 'new',
                 'context': {
-                    'default_driver_pickup_id': False,
                     'active_ids': env.context.get('active_ids', []),
                 }
             }
@@ -1058,4 +1053,5 @@
     <menuitem id="menu_shipping_order_root" name="Shipping Orders" sequence="1" groups="base.group_user"/>
     <menuitem id="menu_orders" name="Orders" parent="menu_shipping_order_root" action="action_orders" sequence="1"/>
     <menuitem id="menu_drivers" name="Drivers" parent="menu_shipping_order_root" action="action_drivers" sequence="2"/>
+    <menuitem id="menu_zones" name="Working Zones" parent="menu_shipping_order_root" action="action_zones" sequence="3"/>
 </odoo>

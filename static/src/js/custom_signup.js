@@ -31,23 +31,32 @@ odoo.define('custom_website.auth_signup', function (require) {
 
         ajax.jsonRpc('/get_provinces', 'call', {}).then(function(data){
             var provinceSelect = $('.oe_signup_form #city');
+            var selectedCity = $('#selected-city').val();
             $.each(data, function(index, item){
-                provinceSelect.append(
-                    $('<option>', {value: item.id, text: item.name})
-                );
+                var option = $('<option>', {value: item.id, text: item.name});
+                if (item.id == selectedCity) {
+                    option.attr('selected', 'selected');
+                }
+                provinceSelect.append(option);
             });
+            if (selectedCity) {
+                provinceSelect.change();
+            }
         });
 
         $('.oe_signup_form #city').on('change', function(){
             var province_name = $(this).val();
-            var citySelect = $('.oe_signup_form #district');
-            citySelect.empty().append('<option value="">Select district</option>');
+            var wardSelect = $('.oe_signup_form #ward');
+            var selectedWard = $('#selected-ward').val();
+            wardSelect.empty().append('<option value="">Select ward</option>');
             if (province_name) {
                 ajax.jsonRpc('/get_city_districts', 'call', {province_name: province_name}).then(function(data){
                     $.each(data, function(index, item){
-                        citySelect.append(
-                            $('<option>', {value: item.id, text: item.name})
-                        );
+                        var option = $('<option>', {value: item.id, text: item.name});
+                        if (item.id == selectedWard) {
+                            option.attr('selected', 'selected');
+                        }
+                        wardSelect.append(option);
                     });
                 });
             }

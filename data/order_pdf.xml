@@ -183,6 +183,5 @@
                 <span>Lưu ý: Kiểm tra kỹ thông tin trước khi giao hàng.</span><br/>
             </div>
         </div>
-        <!-- <div style = "display:block; clear:both; page-break-after:always;"></div> -->
     </template>
 </odoo>

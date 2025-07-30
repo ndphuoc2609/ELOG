@@ -43,7 +43,10 @@ class CustomSignup(AuthSignupHome):
         response = request.env["res.users"].sudo().send_sms(otp_code, phone)
         if response.status_code != 201:  # 201 Created is the success status code for Twilio message creation
             error_response = response.json()
-            return {'status': 'error', 'message': error_response['message']}
+            error_msg = error_response['message'].replace('"To"', '')
+            if error_msg.rfind(":"):
+                error_msg = error_msg[:error_msg.rindex(":")]
+            return {'status': 'error', 'message': error_msg}
         
         return {'status': 'success', 'message': f'OTP code sent to your phone', 'otp': otp_code}
     
@@ -61,7 +64,7 @@ class CustomSignup(AuthSignupHome):
     def get_auth_signup_qcontext(self):
         qcontext = super().get_auth_signup_qcontext()
         # Re-Update context for signup form
-        qcontext.update({k: v for (k, v) in request.params.items() if k in ['city', 'district', 'address', 'phone', 'otp']})
+        qcontext.update({k: v for (k, v) in request.params.items() if k in ['city', 'ward', 'address', 'phone', 'otp']})
         return qcontext
     
     def _prepare_signup_values(self, qcontext):
@@ -90,5 +93,5 @@ class CustomSignup(AuthSignupHome):
         
         values['phone'] = phone
         values['city'] = qcontext.get('city')
-        values['street'] = qcontext.get('address') + ", " + qcontext.get('district')
+        values['street'] = qcontext.get('address') + ", " + qcontext.get('ward')
         return values

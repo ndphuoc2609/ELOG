@@ -50,7 +50,6 @@ class ShippingAPI(http.Controller):
                     'password': password,
                     'session_id': request.session.sid,
                     'warehouse': warehouse,
-                    'is_online': driver.driver_is_online
                 }
                 return request.make_response(json.dumps({
                     "data": payload,
@@ -177,11 +176,13 @@ class ShippingAPI(http.Controller):
         attachment_ids = []
         if order_status:
             current_transport = [transport for transport in order.transport_ids if transport.state == 'in_progress'][0]
+            order_vals = {'status': order_status}
             if order_status == "picked_up":
                 message_body = 'The order has been picked up'
             elif order_status == 'delivered':
                 message_body = 'The order has been delivered'
                 current_transport.write({'state': 'completed'})
+                order_vals.update({'current_location_idx': order.current_location_idx + 1})
             elif order_status == 'failed':
                 if order.status == 'waiting_pickup':
                     message_body = 'Failed to pick up the order'
@@ -193,7 +194,7 @@ class ShippingAPI(http.Controller):
                 message_body = 'The order has been canceled'
                 current_transport.write({'state': 'failed'})
 
-            order.write({'status': order_status})
+            order.write(order_vals)
 
         if failed_note:
             message_body += "\nNote: " + failed_note
@@ -224,16 +225,13 @@ class ShippingAPI(http.Controller):
     @handle_errors
     def update_driver(self):
         data = json.loads(request.httprequest.data.decode('utf-8'))
-        is_online = data.get('is_online')
         latitude = data.get('latitude')
         longitude = data.get('longitude')
 
         driver = request.env.user.employee_id
-        if is_online is not None:
-            driver.write({'driver_is_online': is_online})
 
         if latitude and longitude:
-            driver.write({'driver_latitude': latitude, 'driver_longitude': longitude})
+            driver.write({'driver_latitude': latitude, 'driver_longitude': longitude, 'driver_last_updated': datetime.now()})
 
         return request.make_response(json.dumps({"message": f"Driver updated successfully"}, default=ShippingAPI.serialize), headers={'Content-Type': 'application/json'})
 

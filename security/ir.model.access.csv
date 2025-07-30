@@ -3,3 +3,4 @@ access_shipping_order,access_shipping_order,model_shipping_order,base.group_user
 access_shipping_order_product,access_shipping_order_product,model_shipping_order_product,base.group_user,1,1,1,1
 access_shipping_order_transport,access_shipping_order_transport,model_shipping_order_transport,base.group_user,1,1,1,1
 access_shipping_zone,access_shipping_zone,model_shipping_zone,base.group_user,1,1,1,1
+access_assign_driver_wizard,access_assign_driver_wizard,model_assign_driver_wizard,base.group_user,1,1,1,1

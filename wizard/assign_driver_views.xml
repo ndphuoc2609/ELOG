@@ -1,13 +1,19 @@
 <odoo>
     <data>
-        <record id="view_pickup_driver_wizard" model="ir.ui.view">
-            <field name="name">pickup.driver.wizard.form</field>
-            <field name="model">pickup.driver.wizard</field>
+        <record id="view_assign_driver_wizard" model="ir.ui.view">
+            <field name="name">assign.driver.wizard.form</field>
+            <field name="model">assign.driver.wizard</field>
             <field name="arch" type="xml">
-                <form string="Assign Pickup Driver">
+                <form string="Assign Driver">
                     <group>
-                        <field name="driver_pickup_id" required="false"/>
-                        <field name="driver_delivery_id" required="false"/>
+                        <group>
+                            <field name="shift_id"/>
+                            <field name="shift_start"/>
+                        </group>
+                        <group>
+                            <field name="transport_type"/>
+                            <field name="shift_end"/>
+                        </group>
                     </group>
                     <footer>
                         <button string="Assign" type="object" name="assign_driver" class="btn-primary"/>

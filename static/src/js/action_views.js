@@ -114,10 +114,10 @@ function updateTotals() {
 }
 
 function getRegion(index) {
-    if (index < 26) {
+    if (index < 16) {
         return 0; // Bắc
     }
-    else if (index < 45) {
+    else if (index < 27) {
         return 1; // Trung
     }
     else {

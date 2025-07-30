@@ -28,11 +28,12 @@ class ShippingOrder(models.Model):
     order_id = fields.Char(string='Order ID',unique=True,readonly=True)
     product = fields.Char(string='Product')
     customer_id = fields.Many2one('res.users', string='Customer', required=True)
-    package_location = fields.Char(string='Package Location', compute='_compute_location', readonly=True)
+    package_location = fields.Char(string='Package Location', compute='_compute_location', readonly=True, store=True)
+    next_location = fields.Char(string='Next Location', compute='_compute_location', readonly=True, store=True)
 
     transport_ids = fields.One2many('shipping.order.transport', 'shipping_order_id')
-    current_driver_name = fields.Char(string='Driver Name', compute='_compute_current_driver', readonly=True)
-    current_driver_phone = fields.Char(string='Driver Phone', compute='_compute_current_driver', readonly=True)
+    current_driver_name = fields.Char(string='Driver Name', compute='_compute_current_driver', readonly=True, store=True)
+    current_driver_phone = fields.Char(string='Driver Phone', compute='_compute_current_driver', readonly=True, store=True)
 
     shipping_date = fields.Datetime(string='Shipping Date')
     from_latitude = fields.Char(string='From Latitude')
@@ -46,6 +47,7 @@ class ShippingOrder(models.Model):
         ('waiting_pickup', 'Waiting for Pickup'),
         ('picked_up', 'Picked Up'),
         ('in_transit', 'In Transit'),
+        ('in_warehouse', 'In Warehouse'),
         ('waiting_delivery', 'Waiting for Delivery'),
         ('delivered', 'Delivered'),
         ('failed', 'Failed'),
@@ -129,9 +131,9 @@ class ShippingOrder(models.Model):
     
     def create_transport_auto(self):
         # mark all current transports as completed
-        transports = self.env['shipping.order.transport'].search([('shipping_order_id', '=', self.id), ('state', 'in', ['new', 'in_progress'])])
-        for transport in transports:
-            transport.write({'state': 'completed'})
+        for transport in self.transport_ids:
+            if transport.state == 'new' or transport.state == 'in_progress':
+                transport.write({'state': 'completed'})
 
         # create new transport based on current location
         if self.current_location_idx == 0:
@@ -164,6 +166,12 @@ class ShippingOrder(models.Model):
             
         picking_type = self.env['stock.picking.type'].search([('warehouse_id', '=', warehouse.id), ('name', '=', name)], limit=1)
 
+        # check if transfer already exist
+        existing_transfer = self.env['stock.picking'].search([('origin', '=', self.order_id), ('location_id', '=', from_location.id), ('location_dest_id', '=', to_location.id), 
+                                                              ('state', 'in', ['assigned', 'confirmed']), ('picking_type_id', '=', picking_type.id)])
+        if existing_transfer:
+            return
+        
         picking = self.env['stock.picking'].create({
             'location_id': from_location.id,
             'location_dest_id': to_location.id,
@@ -236,13 +244,15 @@ class ShippingOrder(models.Model):
             order.total_weight = sum([product.weight for product in order.product_ids])
             order.total_shipment_value = sum([product.shipment_value for product in order.product_ids])
     
+    @api.depends('current_location_idx')
     def _compute_location(self):
         for order in self:
-            order.package_location = "Sender"
-            latest_picking = self.env['stock.picking'].search([('origin', '=', order.order_id), ('state', '=', 'done')], limit=1)
-            if latest_picking:
-                order.package_location = latest_picking.location_dest_id.complete_name
+            current_location = self.env['stock.location'].browse(order.all_location_ids[order.current_location_idx])
+            order.package_location = current_location.complete_name
+            next_location = self.env['stock.location'].browse(order.all_location_ids[order.current_location_idx+1]) if order.current_location_idx < len(order.all_location_ids) - 1 else current_location
+            order.next_location = next_location.complete_name
 
+    @api.depends("transport_ids")
     def _compute_current_driver(self):
         for order in self:
             order.current_driver_name = ""
@@ -273,7 +283,7 @@ class StockPicking(models.Model):
                     order.message_post(body=f"The order has left {warehouse_orig} warehouse")
                 else:
                     warehouse_dest = picking.location_dest_id.warehouse_id.name
-                    order.write({"status": "in_transit", "current_location_idx": order.current_location_idx + 1})
+                    order.write({"status": "in_warehouse", "current_location_idx": order.current_location_idx + 1})
                     order.message_post(body=f"The order has arrived at {warehouse_dest} warehouse")
                     order.create_transport_auto()
 
@@ -284,17 +294,14 @@ class PlanningSlot(models.Model):
 
     def write(self, vals):
         resource_id = vals.get("resource_id")
+        shipping_orders = []
         if resource_id:
             new_driver = self.env['resource.resource'].browse(resource_id).user_id
-            transports = self.env['shipping.order.transport'].search([('shift_id', '=', self.id)], limit=1)
+            transports = self.env['shipping.order.transport'].search([('shift_id', '=', self.id)])
             for transport in transports:
-                order_id = transport.shipping_order_id.order_id
-                if transport.type == "pickup":
-                    if self.user_id:
-                        self.user_id.send_push_notification(f"The order #{order_id} is removed from your list")
-                    new_driver.send_push_notification(f"You just got a new pick up order #{order_id}", order_id)
-                elif transport.type == "delivery":
-                    if self.user_id:
-                        self.user_id.send_push_notification(f"The order #{order_id} is removed from your list")
-                    new_driver.send_push_notification(f"You just got a new delivery order #{order_id}", order_id)
-        super().write(vals)
+                transport.notify_driver(new_driver)
+                shipping_orders.append(transport.shipping_order_id)
+        result = super().write(vals)
+        for order in shipping_orders:
+            order._compute_current_driver()
+        return result

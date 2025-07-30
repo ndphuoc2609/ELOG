@@ -1,7 +1,9 @@
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from shapely.geometry import Point, Polygon
 import math
+import ast
 
 MAX_TRANSPORTS_PER_SHIFT = 100
 class ShippingOrderTransport(models.Model):
@@ -17,7 +19,7 @@ class ShippingOrderTransport(models.Model):
                 domain="[('state', '=', 'published'), ('job_title', '=', 'Driver'), ('end_datetime', '>=', context_today().strftime('%Y-%m-%d 00:00:00'))]")
     shift_start = fields.Datetime('Shift start', related = 'shift_id.start_datetime', readonly=True)
     shift_end = fields.Datetime('Shift end', related = 'shift_id.end_datetime', readonly=True)
-    driver_id = fields.Many2one(string='Driver', related='shift_id.employee_id', readonly=True)
+    driver_id = fields.Many2one(string='Driver', related='shift_id.user_id', readonly=True)
     driver_phone = fields.Char(string='Driver Phone', related='driver_id.phone', readonly=True)
     from_location = fields.Many2one('stock.location', string="From Location", required=True, domain=[('name', 'in', ['Stock', 'Customers', 'Vendors'])])
     to_location = fields.Many2one('stock.location', string="To Location", required=True, domain=[('name', 'in', ['Stock', 'Customers', 'Vendors'])])
@@ -80,8 +82,12 @@ class ShippingOrderTransport(models.Model):
             closest_distance = 10000
             closest_zone = None
             for zone in zones:
-                distance = haversine(latitude, longitude, zone.latitude, zone.longitude)
-                if distance <= zone.radius and distance < closest_distance:
+                coord_list = ast.literal_eval(zone.area)
+                area = Polygon([(coord[1], coord[0]) for coord in coord_list])
+                point = Point((longitude, latitude))
+                centroid = area.centroid
+                distance = haversine(latitude, longitude, centroid.y, centroid.x)
+                if area.contains(point) and distance < closest_distance:
                     closest_distance = distance
                     closest_zone = zone
             
@@ -103,6 +109,7 @@ class ShippingOrderTransport(models.Model):
         elif pickup_time.hour > 17: # after 17pm => next day 8am-12pm shift
             pickup_time = pickup_time + timedelta(days=1)
             pickup_time = pickup_time.replace(hour=8, minute=0, second=0)
+        pickup_time = pickup_time.astimezone(timezone.utc)
         next_available_shifts = self.env['planning.slot'].search([('state', '=', 'published'), ('role_id', '=', self.zone_id.role_id.id), 
                                                                  ('end_datetime', '>', pickup_time)], order='start_datetime asc')
         if next_available_shifts:
@@ -128,3 +135,20 @@ class ShippingOrderTransport(models.Model):
         transport = super().create(vals)
         transport.create_tranfers()
         return transport
+    
+    def write(self, vals):
+        shift_id = vals.get('shift_id')
+        if shift_id:
+            new_driver = self.env['planning.slot'].browse(shift_id).user_id
+            self.notify_driver(new_driver)
+        result = super().write(vals)
+        self.shipping_order_id._compute_current_driver()
+        return result
+    
+    def notify_driver(self, new_driver):
+        if self.driver_id and self.driver_id.id == new_driver.id:
+            return
+        order_id = self.shipping_order_id
+        if self.driver_id:
+            self.driver_id.send_push_notification(f"The order #{order_id} is removed from your list")
+        new_driver.send_push_notification(f"You just got a new {self.type} order #{order_id}")

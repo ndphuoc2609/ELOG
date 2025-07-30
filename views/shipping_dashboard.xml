@@ -5,6 +5,6 @@
             <field name="name">Shipping Dashboard</field>
             <field name="tag">owl.shipping_dashboard</field>
         </record>
-        <menuitem id="menu_shipping_dashboard" name="Shipping Dashboard" parent="menu_shipping_order_root" action="action_shipping_dashboard" sequence="2"/>
+        <menuitem id="menu_shipping_dashboard" name="Shipping Dashboard" parent="menu_shipping_order_root" action="action_shipping_dashboard" sequence="99"/>
     </data>
 </odoo>

@@ -1,0 +1,25 @@
+<odoo>
+    <data>
+        <record id="shipping_zone_form" model="ir.ui.view">
+            <field name="name">shipping.zone.form</field>
+            <field name="model">shipping.zone</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="area" widget="zone_picker"/>
+                        </group>
+                        <div id="map" style="height: 700px;"></div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="action_zones" model="ir.actions.act_window">
+            <field name="name">Working Zones</field>
+            <field name="res_model">shipping.zone</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

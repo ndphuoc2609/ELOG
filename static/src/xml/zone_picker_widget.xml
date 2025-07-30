@@ -1,0 +1,5 @@
+<templates xml:space="preserve">
+    <t t-name="custom_website.ZonePickerWidget" owl="1">
+        <input class="input_area" t-ref="inputarea" type="hidden"/>
+    </t>
+</templates>

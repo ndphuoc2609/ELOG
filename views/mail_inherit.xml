@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="mail_message_date_format" inherit_id="mail.message_template">
+        <xpath expr="//small[@class='o_mail_timestamp']" position="replace">
+            <small class="o_mail_timestamp" t-att-title="message.date">
+                <t t-esc="message.date.strftime('%d/%m/%Y %H:%M')"/>
+            </small>
+        </xpath>
+    </template>
+</odoo>

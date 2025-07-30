@@ -28,7 +28,7 @@ export class DriversMapRenderer extends Component {
         );
         this.zones = await this.orm.searchRead(
             'shipping.zone', [],
-            ['latitude', 'longitude', 'radius', 'role_id'],
+            ['area', 'role_id'],
         );
         this.allDrivers = new Map();
         this.map = L.map('map', { zoomControl: false }).setView(['10.808082292265102', '106.66129906625243'], 7);
@@ -53,7 +53,7 @@ export class DriversMapRenderer extends Component {
         );
         this.zones = await this.orm.searchRead(
             'shipping.zone', [],
-            ['latitude', 'longitude', 'radius', 'role_id'],
+            ['area', 'role_id'],
         );
         if (this.map) {
             var currentCenter = this.map.getCenter();
@@ -166,13 +166,8 @@ export class DriversMapRenderer extends Component {
         var workingZone = this.zones.filter(zone => zone.role_id[0] == driver.default_planning_role_id[0]);
         if (workingZone.length > 0) {
             var workingZone = workingZone[0];
-            var circleOptions = {
-                fillColor: 'blue',
-                fillOpacity: 0.2,
-                radius: workingZone.radius * 1000,
-            };
-            var workingCircle = L.circle([workingZone.latitude, workingZone.longitude], circleOptions);
-            driverDetail.set("workingCircle", workingCircle);
+            var workingArea = L.polygon(JSON.parse(workingZone.area));
+            driverDetail.set("workingArea", workingArea);
         }
 
         driverMarker.on('click', () => {
@@ -198,9 +193,9 @@ export class DriversMapRenderer extends Component {
             if (this.map.hasLayer(warehouseMarker)) {
                 this.map.removeLayer(warehouseMarker);
             }
-            const workingCircle = this.allDrivers.get(this.selectedDriver).get('workingCircle');
-            if (workingCircle && this.map.hasLayer(workingCircle)) {
-                this.map.removeLayer(workingCircle);
+            const workingArea = this.allDrivers.get(this.selectedDriver).get('workingArea');
+            if (workingArea && this.map.hasLayer(workingArea)) {
+                this.map.removeLayer(workingArea);
             }
         }
         if (driverPhone != this.selectedDriver) {
@@ -210,9 +205,9 @@ export class DriversMapRenderer extends Component {
             });
             const warehouseMarker = this.allDrivers.get(driverPhone).get('warehouseMarker');
             this.map.addLayer(warehouseMarker);
-            const workingCircle = this.allDrivers.get(driverPhone).get('workingCircle');
-            if (workingCircle) {
-                this.map.addLayer(workingCircle);
+            const workingArea = this.allDrivers.get(driverPhone).get('workingArea');
+            if (workingArea) {
+                this.map.addLayer(workingArea);
             }
             this.selectedDriver = driverPhone;
         } else {

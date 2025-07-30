@@ -2,15 +2,17 @@
    <template id="signup_fields" inherit_id="auth_signup.fields" name="Custom Signup Fields" >
         <xpath expr="//div[hasclass('field-name')]" position="after">
             <div class="mb-3 field-city">
-                <label for="address">Your city</label>
+                <label for="city">Your city</label>
+                <input id="selected-city" t-att-value="city" type="hidden"/>
                 <select class="form-control form-control-sm" id="city" name="city" required="required">
                     <option value="">Select province/city</option>
                 </select>
             </div>
-            <div class="mb-3 field-district">
-                <label for="address">Your district</label>
-                <select class="form-control form-control-sm" id="district" name="district" required="required">
-                    <option value="">Select district</option>
+            <div class="mb-3 field-ward">
+                <label for="ward">Your ward</label>
+                <input id="selected-ward" t-att-value="ward" type="hidden"/>
+                <select class="form-control form-control-sm" id="ward" name="ward" required="required">
+                    <option value="">Select ward</option>
                 </select>
             </div>
             <div class="mb-3 field-address">

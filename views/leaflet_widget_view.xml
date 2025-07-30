@@ -1,12 +1,12 @@
 <odoo>
     <record model="ir.ui.view" id="view_shipping_order_widget">
-        <field name="name">shipping.order.widget</field>
-        <field name="model">shipping.order</field>
-        <field name="inherit_id" ref="custom_website.view_shipping_order_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@name='leaflet']" position="inside">
-                    <widget name="leaflet_map"/>
-            </xpath>
-        </field>
+       <field name="name">shipping.order.widget</field>
+       <field name="model">shipping.order</field>
+       <field name="inherit_id" ref="custom_website.view_shipping_order_form"/>
+       <field name="arch" type="xml">
+           <xpath expr="//div[@name='leaflet']" position="inside">
+                <widget name="leaflet_map"/>
+           </xpath>
+       </field>
    </record>
 </odoo>
